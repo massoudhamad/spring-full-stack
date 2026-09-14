@@ -3,6 +3,7 @@ spring:
     name: procurement-information-system
 
   datasource:
+    # No defaults: credentials come from .env, which is gitignored.
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
