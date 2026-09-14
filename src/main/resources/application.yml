@@ -3,9 +3,9 @@ spring:
     name: procurement-information-system
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/pis}
-    username: ${DB_USER:pis}
-    password: ${DB_PASSWORD:pis_dev}
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
   jpa:
     open-in-view: false          # a lazy load in the view layer is a query nobody planned

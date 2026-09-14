@@ -6,9 +6,9 @@
 # very little about the database you actually deploy to.
 spring:
   datasource:
-    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/pis_test}
-    username: ${TEST_DB_USER:pis}
-    password: ${TEST_DB_PASSWORD:pis_dev}
+    url: ${TEST_DB_URL}
+    username: ${TEST_DB_USER}
+    password: ${TEST_DB_PASSWORD}
 
   jpa:
     hibernate:

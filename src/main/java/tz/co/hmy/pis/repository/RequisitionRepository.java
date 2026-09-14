@@ -22,8 +22,9 @@ public interface RequisitionRepository extends JpaRepository<Requisition, UUID> 
 
     @Query("""
            SELECT r FROM Requisition r
-           WHERE (:status     IS NULL OR r.status = :status)
-             AND (:department IS NULL OR LOWER(r.department) = LOWER(:department))
+           WHERE (CAST(:status AS string)     IS NULL OR r.status = :status)
+             AND (CAST(:department AS string) IS NULL
+                  OR LOWER(r.department) = LOWER(CAST(:department AS string)))
            """)
     Page<Requisition> search(@Param("status") RequisitionStatus status,
                              @Param("department") String department,

@@ -2,17 +2,25 @@
 
 Spring Boot CRUD skeleton — model, repository, service, DTO, controller.
 
-**Spring Boot 4.1.1 · Java 21 · PostgreSQL 17 · Flyway**
+**Spring Boot 3.5.6 · Java 17 · PostgreSQL 17 · Flyway**
 
 ## Setup
 
-PostgreSQL 17 and JDK 21. One-time database setup:
+PostgreSQL 17 and JDK 17. One-time database setup:
 
 ```bash
-createuser pis --pwprompt          # password: pis_dev
-createdb pis      --owner=pis      # development
-createdb pis_test --owner=pis      # tests
+createdb pmis         # development
+createdb pmis_test    # tests
 ```
+
+Then copy the environment template and fill in your own credentials:
+
+```bash
+cp .env.example .env
+```
+
+`.env` is gitignored and read automatically at startup (via `spring-dotenv`).
+Credentials live only there — never in `application.yml`.
 
 ## Run
 
@@ -26,11 +34,12 @@ Flyway creates the schema and loads the seed data on first start.
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - Health: `http://localhost:8080/actuator/health`
 
-Override the connection if your setup differs:
+Connection settings come from `.env`. Real environment variables of the same
+name take precedence, which is how you configure a deployed instance:
 
 ```bash
-DB_URL=jdbc:postgresql://localhost:5432/pis \
-DB_USER=pis DB_PASSWORD=secret \
+DB_URL=jdbc:postgresql://db.internal:5432/pmis \
+DB_USER=pmis_app DB_PASSWORD=... \
 mvn spring-boot:run
 ```
 

@@ -21,8 +21,8 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, UU
 
     @Query("""
            SELECT po FROM PurchaseOrder po
-           WHERE (:status     IS NULL OR po.status = :status)
-             AND (:supplierId IS NULL OR po.supplier.id = :supplierId)
+           WHERE (CAST(:status AS string)     IS NULL OR po.status = :status)
+             AND (CAST(:supplierId AS string) IS NULL OR po.supplier.id = :supplierId)
            """)
     Page<PurchaseOrder> search(@Param("status") PurchaseOrderStatus status,
                                @Param("supplierId") UUID supplierId,

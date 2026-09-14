@@ -19,10 +19,11 @@ public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
 
     @Query("""
            SELECT s FROM Supplier s
-           WHERE (:status   IS NULL OR s.status = :status)
-             AND (:category IS NULL OR s.category = :category)
-             AND (:search   IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                                    OR s.tin LIKE CONCAT('%', :search, '%'))
+           WHERE (CAST(:status AS string)   IS NULL OR s.status = :status)
+             AND (CAST(:category AS string) IS NULL OR s.category = :category)
+             AND (CAST(:search AS string)   IS NULL
+                  OR LOWER(s.name) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                  OR s.tin LIKE CONCAT('%', CAST(:search AS string), '%'))
            """)
     Page<Supplier> search(@Param("status") SupplierStatus status,
                           @Param("category") SupplierCategory category,
