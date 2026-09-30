@@ -1,4 +1,11 @@
+# Build output, local secrets and IDE files, in every project below.
 target/
-.idea/
 .env
 *.log
+.idea/
+*.iml
+.DS_Store
+.github/modernize/
+
+# A stray IntelliJ scratch project, not part of the course.
+procurement-information-system_v1.0/untitled/
