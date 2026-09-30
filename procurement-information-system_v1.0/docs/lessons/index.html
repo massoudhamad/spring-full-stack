@@ -4884,4 +4884,21 @@ approve: 403</div></div>
   window.addEventListener("resize", update);
   update();
 })();
+
+// Diagrams: the Claude artifact viewer draws <pre class="mermaid"> itself. Anywhere
+// else (GitHub Pages, a file opened locally), load Mermaid and draw them here.
+setTimeout(function(){
+  var blocks = Array.prototype.slice.call(document.querySelectorAll("pre.mermaid"));
+  var pending = blocks.filter(function(b){ return !b.querySelector("svg") && !b.getAttribute("data-processed"); });
+  if(!pending.length) return;
+  var s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js";
+  s.onload = function(){
+    var dark = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default" });
+    window.mermaid.run({ nodes: pending });
+  };
+  document.head.appendChild(s);
+}, 1500);
 </script>

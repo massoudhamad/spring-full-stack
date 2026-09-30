@@ -9,7 +9,9 @@ Every lesson ends with tests you can run.
 
 1. **[The lessons](procurement-information-system_v1.0/docs/lessons/README.md)**: what to read, in what order.
 2. **[The testing guide](procurement-information-system_v1.0/docs/lessons/TESTING.md)**: check each lesson step by step.
-3. **[The course web page](procurement-information-system_v1.0/docs/lessons/index.html)**: everything on one page. Download it and open it in a browser.
+3. **[The course web page](https://massoudhamad.github.io/spring-full-stack/procurement-information-system_v1.0/docs/lessons/)**: everything on one page, with a sidebar and a setup box that fills your URL and passwords into every command.
+
+This README is also the home page of the course website: **https://massoudhamad.github.io/spring-full-stack/**
 
 ## What's in this repository
 

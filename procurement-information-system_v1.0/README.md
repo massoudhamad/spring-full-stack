@@ -18,7 +18,7 @@ upgrades this project, and each one ends with tests you can run.
 
 - **[Testing guide](docs/lessons/TESTING.md):** test each lesson step by step: the command, what you should see, and what to check if it doesn't match.
 - **[Course index](docs/lessons/README.md):** the full course map, including the OAuth2 lectures.
-- **[Course web page](docs/lessons/index.html):** the whole course as one page, with a sidebar and a setup box. Download it and open it in a browser.
+- **[Course web page](https://massoudhamad.github.io/spring-full-stack/procurement-information-system_v1.0/docs/lessons/):** the whole course as one page, with a sidebar and a setup box.
 
 This project contains **Lesson 1** in the code; the lessons show how to add the rest. The finished solution is in [`../pis-security-demo/`](../pis-security-demo/), and Lecture 4 in [`../pis-lecture4-authorization-server/`](../pis-lecture4-authorization-server/).
 
