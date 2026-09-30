@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @Transactional rolls each test back, so the suite is repeatable and the
  * seeded reference data survives. MockMvc runs on the calling thread, which is
  * what makes that rollback work — it would not with a running server.
+ *
+ * @WithMockUser puts an authenticated OFFICER in the security context, so these
+ * tests are about the API, not about logging in. SecurityTest covers that.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@WithMockUser(roles = "OFFICER")
 class SupplierApiTest {
 
     @Autowired MockMvc mvc;

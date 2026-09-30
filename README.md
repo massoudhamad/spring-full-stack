@@ -54,7 +54,7 @@ repository/   Spring Data JPA. Queries only.
 model/        JPA entities and enums.
 dto/          Request and response records. Never expose an entity.
 exception/    Domain exceptions plus one @RestControllerAdvice.
-config/       Auditing, OpenAPI.
+config/       Auditing, OpenAPI, security.
 ```
 
 **There is no mapper package.** Each response record carries a static
@@ -109,19 +109,71 @@ the client set any status it likes. `submit` and `approve` are different
 operations with different rules; one endpoint taking a status field cannot
 express that.
 
+## Authentication (HTTP Basic)
+
+Every `/api/v1/**` call needs a username and password. The client sends them
+on **every request** as a header:
+
+```
+Authorization: Basic b2ZmaWNlcjpvZmZpY2VyMTIz      ← base64("officer:officer123")
+```
+
+Base64 is an encoding, not encryption: `echo b2ZmaWNlcjpvZmZpY2VyMTIz | base64 -d`
+gives the password straight back. **Basic auth is only safe over HTTPS.**
+
+Three demo users are held in memory (`SecurityConfig`). Their passwords come
+from `.env` and are BCrypt-hashed at startup:
+
+| User | Roles | `.env` variable |
+| --- | --- | --- |
+| `officer` | OFFICER | `OFFICER_PASSWORD` |
+| `approver` | APPROVER | `APPROVER_PASSWORD` |
+| `admin` | ADMIN, APPROVER, OFFICER | `ADMIN_PASSWORD` |
+
+| Request | Who |
+| --- | --- |
+| `/actuator/health`, Swagger UI, `/v3/api-docs` | anyone |
+| `GET /api/v1/**` | any logged-in user |
+| `POST /api/v1/requisitions/{id}/approve` and `/reject` | APPROVER |
+| `PATCH /api/v1/suppliers/{id}/status` | APPROVER |
+| `DELETE /api/v1/**` | ADMIN |
+| any other `/api/v1/**` write | OFFICER |
+| anything else | nobody |
+
+**401 vs 403.** 401 means *I don't know who you are*: no credentials, or wrong
+ones. 403 means *I know who you are, and your role cannot do this*. Both come
+back as problem details, like every other error.
+
+In Swagger UI, click **Authorize** and enter a username and password.
+
+Full lesson with a demo script, exercises and a quiz:
+[docs/lessons/01-basic-auth.md](docs/lessons/01-basic-auth.md).
+
 ## Try it
 
 ```bash
-curl -s localhost:8080/api/v1/suppliers | jq
+# no credentials → 401 with  WWW-Authenticate: Basic realm="pis"
+curl -i localhost:8080/api/v1/suppliers
 
-curl -s -X POST localhost:8080/api/v1/suppliers \
+# -u builds the Authorization header for you
+curl -s -u officer:officer123 localhost:8080/api/v1/suppliers | jq
+
+# the same thing, by hand
+curl -s -H "Authorization: Basic $(printf 'officer:officer123' | base64)" \
+  localhost:8080/api/v1/suppliers | jq
+
+# right user, wrong role → 403
+curl -s -u officer:officer123 -X POST \
+  localhost:8080/api/v1/requisitions/99999999-9999-9999-9999-999999999999/approve | jq
+
+curl -s -u officer:officer123 -X POST localhost:8080/api/v1/suppliers \
   -H 'Content-Type: application/json' \
   -d '{"name":"Unguja Stationers Ltd","tin":"555-666-777",
        "registrationNumber":"BRELA-2022-5555","category":"GOODS",
        "email":"sales@unguja.co.tz"}' | jq
 
 # validation failure — returns field-level errors
-curl -s -X POST localhost:8080/api/v1/suppliers \
+curl -s -u officer:officer123 -X POST localhost:8080/api/v1/suppliers \
   -H 'Content-Type: application/json' \
   -d '{"name":"","tin":"bad","registrationNumber":"X","category":"GOODS","email":"nope"}' | jq
 ```
@@ -144,6 +196,8 @@ Every error is an RFC 9457 problem detail:
 | Status | When |
 | --- | --- |
 | 400 | Bean validation failed |
+| 401 | No credentials, or wrong ones |
+| 403 | Logged in, but the role does not allow it |
 | 404 | `ResourceNotFoundException` |
 | 409 | Duplicate TIN or registration number |
 | 422 | Business rule violated |
@@ -212,7 +266,10 @@ once and commit `mvnw` and `.mvn/`.
 same reference. Replace with a database sequence per year before this goes
 anywhere real.
 
-**No authentication.** Every endpoint is open.
+**Users live in memory.** Adding a user means a code change and a restart.
+Move them to a `users` table behind a `UserDetailsService`; nothing else in
+`SecurityConfig` has to change. Basic auth also has no logout and sends the
+password on every request, so a browser front end will want sessions or tokens.
 
 **No optimistic locking.** Add `@Version` before two users can edit the same
 requisition.

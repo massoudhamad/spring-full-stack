@@ -23,6 +23,13 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+# Demo users for HTTP Basic. Passwords come from .env, never from this file.
+pis:
+  security:
+    officer-password: ${OFFICER_PASSWORD}
+    approver-password: ${APPROVER_PASSWORD}
+    admin-password: ${ADMIN_PASSWORD}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -34,6 +41,6 @@ management:
         include: health, info
 
 server:
-  port: 8080
+  port: ${SERVER_PORT}
   error:
     include-message: never       # errors go through GlobalExceptionHandler

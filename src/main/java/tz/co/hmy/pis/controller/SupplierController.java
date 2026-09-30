@@ -1,5 +1,10 @@
 package tz.co.hmy.pis.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +25,7 @@ import java.util.UUID;
  * HTTP only. No business rules, no repository calls — if logic appears here it
  * cannot be reused or tested without a web layer.
  */
+@Tag(name = "Suppliers", description = "Supplier registration and approval")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/suppliers")
@@ -27,6 +33,13 @@ public class SupplierController {
 
     private final SupplierService service;
 
+    @Operation(summary = "Register a supplier",
+               description = "TIN and registration number must be unique. New suppliers start as PENDING_APPROVAL.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Created; the Location header carries the new URL"),
+            @ApiResponse(responseCode = "400", description = "Validation failed", content = @Content()),
+            @ApiResponse(responseCode = "409", description = "TIN or registration number already exists", content = @Content())
+    })
     @PostMapping
     public ResponseEntity<SupplierResponse> create(@Valid @RequestBody SupplierRequest request,
                                                    UriComponentsBuilder uri) {
@@ -37,6 +50,8 @@ public class SupplierController {
                 .body(created);
     }
 
+    @Operation(summary = "List suppliers",
+               description = "Filter by status, category, or a free-text search over name and TIN.")
     @GetMapping
     public PageResponse<SupplierResponse> findAll(
             @RequestParam(required = false) SupplierStatus status,
@@ -46,6 +61,13 @@ public class SupplierController {
         return service.findAll(status, category, search, pageable);
     }
 
+    @Operation(summary = "Fetch one supplier")
+    @ApiResponses({
+            // Listing 200 explicitly: a lone @ApiResponse REPLACES the generated
+            // default rather than adding to it, which silently loses the 200.
+            @ApiResponse(responseCode = "200", description = "The supplier"),
+            @ApiResponse(responseCode = "404", description = "No supplier with that id", content = @Content())
+    })
     @GetMapping("/{id}")
     public SupplierResponse findById(@PathVariable UUID id) {
         return service.findById(id);

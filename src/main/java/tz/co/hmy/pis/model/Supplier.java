@@ -3,21 +3,22 @@ package tz.co.hmy.pis.model;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "supplier",
-       uniqueConstraints = {
-           @UniqueConstraint(name = "uk_supplier_tin", columnNames = "tin"),
-           @UniqueConstraint(name = "uk_supplier_reg_no", columnNames = "registration_number")
-       })
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)   // JPA needs it; nothing else may call it
-@ToString(of = {"id", "name", "tin"})                // never the whole object
+@Table(name = "supplier", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_supplier_tin", columnNames = "tin"),
+        @UniqueConstraint(name = "uk_supplier_reg_no", columnNames = "registration_number")
+})
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA needs it; nothing else may call it
+@ToString(of = { "id", "name", "tin" }) // never the whole object
 public class Supplier extends Auditable {
 
     @Id
@@ -67,8 +68,6 @@ public class Supplier extends Auditable {
         this.address = address;
         this.contactPerson = contactPerson;
     }
-
-    // No @Setter. State changes go through named methods so the rules stay here.
 
     public void update(String name, SupplierCategory category, String email,
                        String phone, String address, String contactPerson) {

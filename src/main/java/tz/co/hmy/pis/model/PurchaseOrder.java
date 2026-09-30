@@ -3,7 +3,8 @@ package tz.co.hmy.pis.model;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -17,7 +18,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "purchase_order",
        uniqueConstraints = @UniqueConstraint(name = "uk_po_order_number", columnNames = "order_number"))
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "orderNumber", "status"})
 public class PurchaseOrder extends Auditable {

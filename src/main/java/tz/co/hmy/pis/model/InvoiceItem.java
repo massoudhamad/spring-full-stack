@@ -12,21 +12,21 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "requisition_item")
+@Table(name = "invoice_item")
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "description", "quantity"})   // requisition excluded: would recurse
-public class RequisitionItem {
+@ToString(of = {"id", "description", "quantity"})   // invoice excluded: would recurse
+public class InvoiceItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /** Owning side. No cascade back to the parent — deleting a line must not delete the requisition. */
-    @Setter(AccessLevel.PACKAGE)   // only Requisition's helpers may set this
+    /** Owning side. No cascade back to the parent — deleting a line must not delete the invoice. */
+    @Setter(AccessLevel.PACKAGE)   // only Invoice's helpers may set this
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requisition_id")
-    private Requisition requisition;
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
 
     @Column(name = "item_code", length = 40)
     private String itemCode;
@@ -41,20 +41,20 @@ public class RequisitionItem {
     @Column(nullable = false, length = 20)
     private UnitOfMeasure unit;
 
-    @Column(name = "estimated_unit_price", nullable = false, precision = 19, scale = 2)
-    private BigDecimal estimatedUnitPrice;
+    @Column(name = "unit_price", nullable = false, precision = 19, scale = 2)
+    private BigDecimal unitPrice;
 
     @Builder
-    public RequisitionItem(String itemCode, String description, int quantity,
-                           UnitOfMeasure unit, BigDecimal estimatedUnitPrice) {
+    public InvoiceItem(String itemCode, String description, int quantity,
+                       UnitOfMeasure unit, BigDecimal unitPrice) {
         this.itemCode = itemCode;
         this.description = description;
         this.quantity = quantity;
         this.unit = unit;
-        this.estimatedUnitPrice = estimatedUnitPrice;
+        this.unitPrice = unitPrice;
     }
 
     public BigDecimal getLineTotal() {
-        return estimatedUnitPrice.multiply(BigDecimal.valueOf(quantity));
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }
