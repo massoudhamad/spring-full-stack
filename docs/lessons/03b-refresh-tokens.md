@@ -989,6 +989,10 @@ a) The tests don't call `/refresh`  b) Each test runs in one transaction that's 
 
 ## Next lectures
 
+**→ [Lesson 3C — Permissions and Method Security](03c-permissions.md)** comes
+first, in this same project: permissions instead of role names, `@PreAuthorize`,
+and *nobody approves a requisition they raised*.
+
 The PIS project now has everything a single application needs: users, roles,
 an audit trail, access tokens and refresh tokens. **PIS issues its own tokens.**
 

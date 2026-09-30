@@ -86,7 +86,7 @@ code{font:0.9em var(--mono);background:var(--accent-soft);padding:1px 5px;border
 .s200{background:var(--ok-bg);color:var(--ok)} .s401{background:var(--warn-bg);color:var(--warn)}
 .s403{background:var(--bad-bg);color:var(--bad)} .s404{background:var(--info-bg);color:var(--info)}
 
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
 @media (max-width:640px){.pair{grid-template-columns:1fr}}
 .pair > div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
 .pair h4{margin:0 0 6px;font:600 16px var(--display)}
@@ -226,6 +226,22 @@ tr.planned-row td{color:var(--muted)}
 .pager a:hover{border-color:var(--ink)}
 section[id],article[id],h2[id]{scroll-margin-top:24px}
 @media (max-width:920px){section[id],article[id],h2[id]{scroll-margin-top:64px}}
+
+.side-group.active > .c-l3c .num{background:var(--l3);border-color:var(--l3)}
+.step.c-l3c b{background:var(--l3)}
+.lesson.c-l3c{border-top-color:var(--l3)} .lesson.c-l3c .lesson-head .eyebrow{color:var(--l3)}
+table.matrix td.c,table.matrix th.c{text-align:center;width:90px}
+
+.lesson.c-testing{border-top-color:var(--ink)}
+.side-group.active > .c-testing .num{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.tstep{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px 18px 6px;margin:14px 0}
+.tstep h4{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;font:600 17px/1.3 var(--display)}
+.tstep .snum{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);font:600 13px var(--mono)}
+.tstep > p{margin:4px 0 8px;font-size:15px}
+.tstep .see{margin-top:10px}
+.tstep .out{margin:0 0 12px}
+.tstep .iffail{font-size:14px;color:var(--muted);border-left:3px solid var(--warn);padding-left:10px}
+.done{font-size:15px;margin-top:18px}
 </style>
 
 <div class="layout" id="top">
@@ -233,10 +249,12 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
 <a class="brand" href="#top">PIS Security Course</a>
 <div class="side-group" data-group="overview"><a class="side-lesson" href="#overview"><span class="num">·</span><span>Course overview</span></a>
 <div class="side-sub"><a href="#map">Course map</a><a href="#setup">Your setup</a><a href="#environments">Apps and ports</a><a href="#how">How to use this page</a></div></div>
+<div class="side-group" data-group="testing"><a class="side-lesson c-testing" href="#testing"><span class="num">✓</span><span>Testing guide</span></a><div class="side-sub"><a href="#t-setup">Before you start</a><a href="#t-1">Lesson 1</a><a href="#t-2">Lesson 2</a><a href="#t-3">Lesson 3</a><a href="#t-3b">Lesson 3B</a><a href="#t-3c">Lesson 3C</a><a href="#t-4">Lecture 4</a><a href="#t-trouble">When a step doesn't match</a></div></div>
 <div class="side-group" data-group="l1"><a class="side-lesson c-l1" href="#l1"><span class="num">1</span><span>HTTP Basic and roles</span></a><div class="side-sub"><a href="#l1-goals">Goals</a><a href="#l1-concepts">Concepts</a><a href="#l1-flow">Request flow</a><a href="#l1-build">Build it</a><a href="#l1-demo">Try it</a><a href="#l1-tests">Test it</a><a href="#l1-mistakes">Mistakes</a><a href="#l1-exercises">Exercises</a><a href="#l1-quiz">Quiz</a><a href="#l1-smoke">Smoke test</a></div></div>
 <div class="side-group" data-group="l2"><a class="side-lesson c-l2" href="#l2"><span class="num">2</span><span>Users in the database</span></a><div class="side-sub"><a href="#l2-goals">Goals</a><a href="#l2-concepts">Concepts</a><a href="#l2-flow">Request flow</a><a href="#l2-upgrade">Upgrade checklist</a><a href="#l2-build">Build it</a><a href="#l2-demo">Try it</a><a href="#l2-tests">Test it</a><a href="#l2-mistakes">Mistakes</a><a href="#l2-exercises">Exercises</a><a href="#l2-quiz">Quiz</a><a href="#l2-smoke">Smoke test</a></div></div>
 <div class="side-group" data-group="l3"><a class="side-lesson c-l3" href="#l3"><span class="num">3</span><span>Tokens and JWT</span></a><div class="side-sub"><a href="#l3-goals">Goals</a><a href="#l3-concepts">Concepts</a><a href="#l3-flow">Request flow</a><a href="#l3-upgrade">Upgrade checklist</a><a href="#l3-build">Build it</a><a href="#l3-demo">Try it</a><a href="#l3-tradeoff">The trade-off</a><a href="#l3-tests">Test it</a><a href="#l3-mistakes">Mistakes</a><a href="#l3-exercises">Exercises</a><a href="#l3-quiz">Quiz</a><a href="#l3-smoke">Smoke test</a></div></div>
 <div class="side-group" data-group="l3b"><a class="side-lesson c-l3b" href="#l3b"><span class="num">3B</span><span>Refresh tokens</span></a><div class="side-sub"><a href="#l3b-goals">Goals</a><a href="#l3b-concepts">Concepts</a><a href="#l3b-flow">Request flow</a><a href="#l3b-upgrade">Upgrade checklist</a><a href="#l3b-build">Build it</a><a href="#l3b-demo">Try it</a><a href="#l3b-tests">Test it</a><a href="#l3b-mistakes">Mistakes</a><a href="#l3b-exercises">Exercises</a><a href="#l3b-quiz">Quiz</a><a href="#l3b-smoke">Smoke test</a></div></div>
+<div class="side-group" data-group="l3c"><a class="side-lesson c-l3c" href="#l3c"><span class="num">3C</span><span>Permissions</span></a><div class="side-sub"><a href="#l3c-goals">Goals</a><a href="#l3c-concepts">Concepts</a><a href="#l3c-flow">Request flow</a><a href="#l3c-upgrade">Upgrade checklist</a><a href="#l3c-build">Build it</a><a href="#l3c-demo">Try it</a><a href="#l3c-tests">Test it</a><a href="#l3c-mistakes">Mistakes</a><a href="#l3c-exercises">Exercises</a><a href="#l3c-quiz">Quiz</a><a href="#l3c-smoke">Smoke test</a></div></div>
 <div class="side-group" data-group="l4"><a class="side-lesson c-l4" href="#l4"><span class="num">4</span><span>Spring Authorization Server</span></a><div class="side-sub"><a href="#l4-goals">Goals</a><a href="#l4-concepts">Concepts</a><a href="#l4-flows">The flows</a><a href="#l4-project">The project</a><a href="#l4-server">Build · auth server</a><a href="#l4-api">Build · resource server</a><a href="#l4-demo">Try it</a><a href="#l4-tests">Test it</a><a href="#l4-mistakes">Mistakes</a><a href="#l4-exercises">Exercises</a><a href="#l4-quiz">Quiz</a><a href="#l4-smoke">Smoke test</a></div></div>
 <div class="side-group planned"><span class="side-lesson"><span class="num">5</span><span>Keycloak</span><span class="pill">planned</span></span></div>
 <div class="side-group planned"><span class="side-lesson"><span class="num">6</span><span>Log in with Google / GitHub</span><span class="pill">planned</span></span></div>
@@ -247,24 +265,25 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
 <section id="overview" class="overview">
   <div class="eyebrow">Spring Security · Procurement Information System</div>
   <h1>PIS Security Course</h1>
-  <p class="lede">From a wide-open API to one account per person, signed tokens, refresh tokens, and finally a separate OAuth2 authorization server. Every lesson builds on real PIS code, and every lesson ends with a smoke-test script you can run against your own app.</p>
+  <p class="lede">From a wide-open API to one account per person, signed tokens, refresh tokens, permissions, and finally a separate OAuth2 authorization server. Every lesson builds on real PIS code, and every lesson ends with a smoke-test script you can run against your own app.</p>
 
   <div class="path" aria-label="Learning path">
     <a href="#l1" class="step c-l1"><b>1</b>Basic</a><span>→</span>
     <a href="#l2" class="step c-l2"><b>2</b>Users</a><span>→</span>
     <a href="#l3" class="step c-l3"><b>3</b>JWT</a><span>→</span>
     <a href="#l3b" class="step c-l3b"><b>3B</b>Refresh</a><span>→</span>
+    <a href="#l3c" class="step c-l3c"><b>3C</b>Permissions</a><span>→</span>
     <a href="#l4" class="step c-l4"><b>4</b>OAuth2</a><span>→</span>
     <span class="step off"><b>5</b>Keycloak</span><span>→</span>
     <span class="step off"><b>6</b>Social</span>
   </div>
 
-  <h2 class="s" id="map"><span class="n">COURSE MAP</span>Seven lessons, two kinds of project</h2>
+  <h2 class="s" id="map"><span class="n">COURSE MAP</span>Eight lessons, two kinds of project</h2>
   <div class="tbl"><table>
     <thead><tr><th>#</th><th>Lesson</th><th>Time</th><th>Where the code lives</th><th>Status</th></tr></thead>
-    <tbody><tr><td class="num"><a href="#l1">1</a></td><td><a href="#l1">HTTP Basic and roles</a><div class="muted small">Lock the API with HTTP Basic authentication and role rules, then prove it with curl, Swagger UI and tests.</div></td><td class="num">2 hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l2">2</a></td><td><a href="#l2">Users in the database</a><div class="muted small">Lesson 1 locked the door. Lesson 2 hands out the keys, and writes down who used them.</div></td><td class="num">2½ hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l3">3</a></td><td><a href="#l3">Tokens and JWT</a><div class="muted small">Show your password once, get a pass, show the pass from then on.</div></td><td class="num">2½ hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l3b">3B</a></td><td><a href="#l3b">Refresh tokens</a><div class="muted small">Short-lived passes, and a way to renew them that you can take away.</div></td><td class="num">2 hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l4">4</a></td><td><a href="#l4">Spring Authorization Server</a><div class="muted small">Take the keys away from the application. A separate server logs people in and signs tokens; PIS only checks them.</div></td><td class="num">3 hours</td><td class="k">pis-lecture4-authorization-server/<wbr></td><td><span class="pill ok">ready</span></td></tr><tr class="planned-row"><td class="num">5</td><td>Keycloak<div class="muted small">The same, with the identity server most organisations run. Needs Docker.</div></td><td>—</td><td class="k">pis-lecture5-…</td><td><span class="pill">planned</span></td></tr><tr class="planned-row"><td class="num">6</td><td>Log in with Google / GitHub<div class="muted small">PIS as an OAuth2 client of a social login. Needs an OAuth app in your account.</div></td><td>—</td><td class="k">pis-lecture6-…</td><td><span class="pill">planned</span></td></tr></tbody>
+    <tbody><tr><td class="num"><a href="#l1">1</a></td><td><a href="#l1">HTTP Basic and roles</a><div class="muted small">Lock the API with HTTP Basic authentication and role rules, then prove it with curl, Swagger UI and tests.</div></td><td class="num">2 hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l2">2</a></td><td><a href="#l2">Users in the database</a><div class="muted small">Lesson 1 locked the door. Lesson 2 hands out the keys, and writes down who used them.</div></td><td class="num">2½ hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l3">3</a></td><td><a href="#l3">Tokens and JWT</a><div class="muted small">Show your password once, get a pass, show the pass from then on.</div></td><td class="num">2½ hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l3b">3B</a></td><td><a href="#l3b">Refresh tokens</a><div class="muted small">Short-lived passes, and a way to renew them that you can take away.</div></td><td class="num">2 hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l3c">3C</a></td><td><a href="#l3c">Permissions and method security</a><div class="muted small">Check what a person may do, not their job title. Nobody approves what they raised.</div></td><td class="num">2½ hours</td><td class="k">PIS project</td><td><span class="pill ok">ready</span></td></tr><tr><td class="num"><a href="#l4">4</a></td><td><a href="#l4">Spring Authorization Server</a><div class="muted small">Take the keys away from the application. A separate server logs people in and signs tokens; PIS only checks them.</div></td><td class="num">3 hours</td><td class="k">pis-lecture4-authorization-server/<wbr></td><td><span class="pill ok">ready</span></td></tr><tr class="planned-row"><td class="num">5</td><td>Keycloak<div class="muted small">The same, with the identity server most organisations run. Needs Docker.</div></td><td>—</td><td class="k">pis-lecture5-…</td><td><span class="pill">planned</span></td></tr><tr class="planned-row"><td class="num">6</td><td>Log in with Google / GitHub<div class="muted small">PIS as an OAuth2 client of a social login. Needs an OAuth app in your account.</div></td><td>—</td><td class="k">pis-lecture6-…</td><td><span class="pill">planned</span></td></tr></tbody>
   </table></div>
-  <p>Lessons 1–3B upgrade <strong>the PIS project itself</strong>, one step at a time: each starts where the previous one ended. Lectures 4–6 are <strong>separate projects</strong>, each starting from the finished Lesson 3B code.</p>
+  <p>Lessons 1–3B upgrade <strong>the PIS project itself</strong>, one step at a time: each starts where the previous one ended. Lectures 4–6 are <strong>separate projects</strong>, each starting from the finished Lesson 3B code (Lesson 3C is optional for them).</p>
 
   <h2 class="s" id="setup-h"><span class="n">YOUR SETUP</span>Fill in once, copy everywhere</h2>
   <div class="setup" id="setup">
@@ -284,7 +303,7 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
     <thead><tr><th>App</th><th>Port</th><th>Database</th><th>Use it for</th></tr></thead>
     <tbody>
       <tr><td>Your PIS project</td><td class="num">8080</td><td class="k">pmis / pmis_test</td><td>Following Lessons 1–3B step by step</td></tr>
-      <tr><td><code>pis-security-demo</code></td><td class="num">8099</td><td class="k">pmis_demo / pmis_demo_test</td><td>The finished Lessons 1–3B, for reference and demos</td></tr>
+      <tr><td><code>pis-security-demo</code></td><td class="num">8099</td><td class="k">pmis_demo / pmis_demo_test</td><td>The finished Lessons 1–3C, for reference and demos</td></tr>
       <tr><td>Lecture 4 <code>auth-server</code></td><td class="num">9100</td><td class="k">—</td><td>Logs people in, issues tokens</td></tr>
       <tr><td>Lecture 4 <code>pis-api</code></td><td class="num">8181</td><td class="k">pmis_oauth / pmis_oauth_test</td><td>PIS as a resource server</td></tr>
     </tbody>
@@ -294,6 +313,7 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
   <h2 class="s" id="how"><span class="n">HOW TO USE THIS PAGE</span>Teach, try, verify</h2>
   <div class="pair">
     <div><h4>Each lesson has the same parts</h4><p>Goals and timing · Concepts · Request flow · Upgrade checklist · Build it · Try it with curl · Test it · Common mistakes · Exercises with solutions · Quiz · Smoke test.</p></div>
+    <div><h4>Testing a lesson</h4><p>The <a href="#testing"><strong>Testing guide</strong></a> walks through every lesson in numbered steps: command, what you should see, and what to check if it doesn't match.</p></div>
     <div><h4>Running a smoke test</h4><p>Click <strong>Copy</strong> on the script, then <code>pbpaste &gt; smoke.sh &amp;&amp; bash smoke.sh</code> (macOS), or paste into any editor. Every step prints PASS or FAIL.</p></div>
   </div>
   <p>The same material is in Markdown next to the code: <code>docs/lessons/</code> in the PIS project, and <code>LECTURE.md</code> in each lecture project.</p>
@@ -307,7 +327,7 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
     <div class="facts">
       <span><b>Project</b>PIS project</span>
       <span><b>Markdown</b>docs/lessons/01-basic-auth.md</span>
-      <span><b>Check it</b><a href="#l1-smoke">Smoke test</a></span>
+      <span><b>Check it</b><a href="#t-1">Step by step</a> · <a href="#l1-smoke">Smoke test</a></span>
     </div>
   </header>
   <section id="l1-goals">
@@ -363,6 +383,24 @@ section[id],article[id],h2[id]{scroll-margin-top:24px}
       <tr><td><code>officer</code></td><td>OFFICER</td><td>Registers suppliers, raises requisitions and purchase orders</td></tr>
       <tr><td><code>approver</code></td><td>APPROVER</td><td>Approves or rejects requisitions, changes supplier status</td></tr>
       <tr><td><code>admin</code></td><td>ADMIN, APPROVER, OFFICER</td><td>Everything, including deletes</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>This is RBAC: role-based access control</h3>
+  <p>What you're building has a name: <strong>role-based access control (RBAC)</strong>. Every rule names a <strong>role</strong>, and a person is allowed in if they hold it: <code>hasRole("APPROVER")</code>. It's the right starting point, simple and close to how an organisation thinks ("approvers approve"). It has two limits, and <a href="#l3c">Lesson 3C</a> fixes both:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Limit</th><th>Example in PIS</th><th>Fixed by</th></tr></thead>
+    <tbody>
+      <tr><td>The rule names a <strong>job title</strong>, not an <strong>action</strong></td><td>Adding a read-only auditor means checking every rule by hand</td><td><strong>Permissions</strong>: <code>hasAuthority("requisition:approve")</code>, with roles as bundles of permissions</td></tr>
+      <tr><td>The rule can't look at the <strong>record</strong></td><td>An approver who raised a requisition could approve it themselves</td><td><strong><code>@PreAuthorize</code></strong> with a rule that checks <code>created_by</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>Question it answers</th><th>Spring</th></tr></thead>
+    <tbody>
+      <tr><td>Role-based (RBAC)</td><td>Is this person an APPROVER?</td><td><code>hasRole("APPROVER")</code></td></tr>
+      <tr><td>Permission-based</td><td>May this person approve requisitions?</td><td><code>hasAuthority("requisition:approve")</code></td></tr>
+      <tr><td>Attribute-based (ABAC)</td><td>May this person approve <strong>this</strong> requisition?</td><td><code>@PreAuthorize("… @requisitionGuard.raisedBy(#id, authentication.name)")</code></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -720,7 +758,7 @@ PASS  404  admin can delete</div>
     <div class="facts">
       <span><b>Project</b>PIS project</span>
       <span><b>Markdown</b>docs/lessons/02-users-in-database.md</span>
-      <span><b>Check it</b><a href="#l2-smoke">Smoke test</a></span>
+      <span><b>Check it</b><a href="#t-2">Step by step</a> · <a href="#l2-smoke">Smoke test</a></span>
     </div>
   </header>
   <div class="two-scope">
@@ -1499,7 +1537,7 @@ PASS  200  officer is back</div>
     <div class="facts">
       <span><b>Project</b>PIS project</span>
       <span><b>Markdown</b>docs/lessons/03-jwt.md</span>
-      <span><b>Check it</b><a href="#l3-smoke">Smoke test</a></span>
+      <span><b>Check it</b><a href="#t-3">Step by step</a> · <a href="#l3-smoke">Smoke test</a></span>
     </div>
   </header>
   <div class="three-scope">
@@ -2181,7 +2219,7 @@ PASS  200  admin enables officer again</div>
     <div class="facts">
       <span><b>Project</b>PIS project</span>
       <span><b>Markdown</b>docs/lessons/03b-refresh-tokens.md</span>
-      <span><b>Check it</b><a href="#l3b-smoke">Smoke test</a></span>
+      <span><b>Check it</b><a href="#t-3b">Step by step</a> · <a href="#l3b-smoke">Smoke test</a></span>
     </div>
   </header>
   <div class="three-scope">
@@ -2618,7 +2656,1041 @@ PASS  200  admin enables officer again
 PASS  401  ...and that family stays revoked</div>
 </section>
 </div>
-  <nav class="pager" aria-label="Lesson navigation"><a href="#l3" class="prev"><span>Previous</span>3 · Tokens and JWT</a><a href="#l4" class="next"><span>Next</span>4 · Spring Authorization Server</a></nav>
+  <nav class="pager" aria-label="Lesson navigation"><a href="#l3" class="prev"><span>Previous</span>3 · Tokens and JWT</a><a href="#l3c" class="next"><span>Next</span>3C · Permissions and method security</a></nav>
+</article>
+
+<article class="lesson c-l3c" id="l3c">
+  <header class="lesson-head">
+    <div class="eyebrow">Lesson 3C · 2½ hours</div>
+    <h2>Permissions and method security</h2>
+    <p class="lede">Check what a person may do, not what their job title is. And nobody approves a requisition they raised, not even an admin.</p>
+    <div class="facts">
+      <span><b>Project</b>PIS project</span>
+      <span><b>Markdown</b>docs/lessons/03c-permissions.md</span>
+      <span><b>Check it</b><a href="#t-3c">Step by step</a> · <a href="#l3c-smoke">Smoke test</a></span>
+    </div>
+  </header>
+  <div class="three-scope">
+
+<section id="l3c-goals">
+  <h2 class="s"><span class="n">GOALS</span>By the end of this lesson you can…</h2>
+  <ul>
+    <li>Explain <strong>RBAC</strong>, <strong>permission-based</strong> and <strong>attribute-based</strong> access control, and when each is the right tool.</li>
+    <li>Model permissions as an enum, and roles as bundles of permissions.</li>
+    <li>Load roles <em>and</em> permissions as Spring authorities, for Basic logins and for JWTs.</li>
+    <li>Write URL rules with <code>hasAuthority(...)</code> instead of <code>hasRole(...)</code>.</li>
+    <li>Protect a service method with <code>@PreAuthorize</code>, including a rule that reads the record: <em>you may not approve what you raised</em>.</li>
+    <li>Make a denied method call return <strong>403</strong>, not 500.</li>
+    <li>Test with <code>@WithRole</code>, which uses the same role → permission mapping as production.</li>
+  </ul>
+  <div class="note"><b>Complete files</b>Every code block in this lesson is a complete file with its <code>package</code> and <code>import</code> lines, taken from the tested project. Where a file changes in only one place, the label says "changed part".</div>
+  <div class="tbl"><table>
+    <thead><tr><th>Time</th><th>Activity</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0–25</td><td>RBAC, permissions, attributes; URL rules vs method rules</td></tr>
+      <tr><td class="num">25–35</td><td>Request flow: two checkpoints</td></tr>
+      <tr><td class="num">35–95</td><td>Build it: permissions, roles, authorities, token claim, rules, <code>@PreAuthorize</code>, guard, 403 handler</td></tr>
+      <tr><td class="num">95–110</td><td>Try it live: approve someone else's requisition, then your own</td></tr>
+      <tr><td class="num">110–150</td><td>Tests with <code>@WithRole</code>, break-it exercises, quiz</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="l3c-concepts">
+  <h2 class="s"><span class="n">CONCEPTS</span>Three ways to decide "may this person do this?"</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Role-based (RBAC)</th><th>Permission-based</th><th>Attribute-based (ABAC)</th></tr></thead>
+    <tbody>
+      <tr><td>The rule asks</td><td>Is this person an <strong>APPROVER</strong>?</td><td>May this person <strong><code>requisition:approve</code></strong>?</td><td>May this person approve <strong>this</strong> requisition?</td></tr>
+      <tr><td>Looks at</td><td>The job title</td><td>The actions the person may take</td><td>The person, the action <strong>and the record</strong></td></tr>
+      <tr><td>In Spring</td><td><code>hasRole("APPROVER")</code></td><td><code>hasAuthority("requisition:approve")</code></td><td><code>@PreAuthorize("… !@requisitionGuard.raisedBy(#id, authentication.name)")</code></td></tr>
+      <tr><td>In PIS</td><td>Lessons 1–3B</td><td>This lesson</td><td>This lesson</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>RBAC</strong> names a <em>job title</em>, not an <em>action</em>. Add a read-only auditor, and you're checking every rule by hand. <strong>Permission-based</strong> access control splits it in two: the <strong>code</strong> checks only permissions, and <strong>one mapping</strong> decides which roles hold which. Roles don't disappear; they become bundles of permissions, the thing an admin assigns to a person.</p>
+  <p><strong>Attribute-based</strong> rules look at the data. <em>You may not approve a requisition you raised</em> is a separation-of-duties rule that procurement audits check. No role or permission can express it, because it depends on who created <em>this</em> requisition: <code>created_by</code>, from Lesson 2.</p>
+
+  <h3>Two checkpoints</h3>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>URL rules (<code>SecurityConfig</code>)</th><th>Method rules (<code>@PreAuthorize</code>)</th></tr></thead>
+    <tbody>
+      <tr><td>Runs</td><td>In a filter, before any controller</td><td>Around the service method</td></tr>
+      <tr><td>Protects</td><td>One HTTP path</td><td>The action, however it's called: controller, job, another service</td></tr>
+      <tr><td>Can see the record?</td><td>No</td><td>Yes: arguments (<code>#id</code>) and beans (<code>@requisitionGuard</code>)</td></tr>
+      <tr><td>A "no" becomes</td><td>403 from <code>ProblemDetailSecurityHandler</code></td><td><code>AccessDeniedException</code> <strong>inside</strong> the controller call</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Why a 403 handler is needed</b>A method rule throws <code>AccessDeniedException</code> from inside the service. It lands in <code>GlobalExceptionHandler</code>, whose catch-all would turn it into a <strong>500</strong>. Exercise 2 shows it.</div>
+
+  <h3>The mapping in PIS</h3>
+  <div class="tbl"><table class="matrix">
+    <thead><tr><th>Permission</th><th class="c">OFFICER</th><th class="c">APPROVER</th><th class="c">ADMIN</th></tr></thead>
+    <tbody><tr><td><code>supplier:read</code></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>supplier:write</code></td><td class="c">✓</td><td class="c"></td><td class="c">✓</td></tr><tr><td><code>supplier:approve</code></td><td class="c"></td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>requisition:read</code></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>requisition:write</code></td><td class="c">✓</td><td class="c"></td><td class="c">✓</td></tr><tr><td><code>requisition:approve</code></td><td class="c"></td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>purchase-order:read</code></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>purchase-order:write</code></td><td class="c">✓</td><td class="c"></td><td class="c">✓</td></tr><tr><td><code>invoice:read</code></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr><tr><td><code>invoice:write</code></td><td class="c">✓</td><td class="c"></td><td class="c">✓</td></tr><tr><td><code>record:delete</code></td><td class="c"></td><td class="c"></td><td class="c">✓</td></tr><tr><td><code>user:manage</code></td><td class="c"></td><td class="c"></td><td class="c">✓</td></tr></tbody>
+  </table></div>
+  <p class="muted">This gives exactly the same access as Lesson 1's role rules, on purpose: the four earlier smoke tests still pass unchanged on this lesson's code.</p>
+</section>
+
+<section id="l3c-flow">
+  <h2 class="s"><span class="n">REQUEST FLOW</span>An admin tries to approve their own</h2>
+<pre class="mermaid">
+sequenceDiagram
+    participant C as Admin (holds every permission)
+    participant F as Security filters (URL rules)
+    participant S as RequisitionService.approve
+    participant G as RequisitionGuard
+    participant DB as requisition table
+    C->>F: POST /requisitions/{id}/approve
+    F->>F: hasAuthority requisition:approve? yes
+    F->>S: controller calls approve(id)
+    S->>S: @PreAuthorize: permission and not raisedBy(id, name)
+    S->>G: raisedBy(id, "admin")
+    G->>DB: SELECT created_by FROM requisition
+    DB-->>G: "admin"
+    G-->>S: true, so the rule is false
+    S-->>C: AccessDeniedException to GlobalExceptionHandler: 403 Access denied
+</pre>
+  <p>The method body never runs, so the requisition stays <code>SUBMITTED</code>, and another approver can still approve it.</p>
+</section>
+
+<section id="l3c-upgrade">
+  <h2 class="s"><span class="n">UPGRADE CHECKLIST</span>From the end of Lesson 3B</h2>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>File</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td>➕</td><td class="k">model/Permission</td><td>One constant per action</td></tr>
+      <tr><td>✏️</td><td class="k">model/Role</td><td>Each role carries its permissions</td></tr>
+      <tr><td>➕</td><td class="k">security/Authorities</td><td>Roles → <code>ROLE_x</code> plus permissions, in one place</td></tr>
+      <tr><td>✏️</td><td class="k">DatabaseUserDetailsService</td><td><code>.authorities(...)</code> instead of <code>.roles(...)</code></td></tr>
+      <tr><td>✏️</td><td class="k">TokenService, JwtConfig</td><td>A <code>permissions</code> claim, read back as authorities</td></tr>
+      <tr><td>✏️</td><td class="k">SecurityConfig</td><td>Every rule uses <code>hasAuthority(...)</code></td></tr>
+      <tr><td>➕</td><td class="k">MethodSecurityConfig</td><td><code>@EnableMethodSecurity</code></td></tr>
+      <tr><td>➕</td><td class="k">security/RequisitionGuard</td><td>"Did this user raise this requisition?"</td></tr>
+      <tr><td>✏️</td><td class="k">RequisitionService</td><td><code>@PreAuthorize</code> on <code>approve</code> and <code>reject</code></td></tr>
+      <tr><td>✏️</td><td class="k">GlobalExceptionHandler</td><td><code>AccessDeniedException</code> → 403</td></tr>
+      <tr><td>✏️</td><td class="k">UserResponse, RequisitionResponse</td><td><code>permissions</code>; <code>createdBy</code>, <code>updatedBy</code></td></tr>
+      <tr><td>➕</td><td class="k">WithRole, WithRoleSecurityContextFactory</td><td>Tests: a mock user with the real permissions</td></tr>
+      <tr><td>✏️</td><td class="k">SupplierApiTest, SecurityTest, JwtTest</td><td>Use <code>@WithRole</code> or real permissions</td></tr>
+      <tr><td>➕</td><td class="k">PermissionTest</td><td>New, 8 tests</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">No migration: roles are still stored by name in <code>app_user_role</code>.</p>
+</section>
+
+<section id="l3c-build">
+  <h2 class="s"><span class="n">BUILD IT</span>Permissions, rules, method security</h2>
+  <h3>1 · The permissions</h3>
+<div class="code"><div class="file">model/Permission.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.model;
+
+/**
+ * One permission per action. The code checks these, never role names:
+ *   hasAuthority("requisition:approve")   not   hasRole("APPROVER")
+ *
+ * The string is what Spring Security sees as the authority, and what goes
+ * into the JWT's "permissions" claim.
+ */
+public enum Permission {
+
+    SUPPLIER_READ("supplier:read"),
+    SUPPLIER_WRITE("supplier:write"),
+    SUPPLIER_APPROVE("supplier:approve"),
+
+    REQUISITION_READ("requisition:read"),
+    REQUISITION_WRITE("requisition:write"),
+    REQUISITION_APPROVE("requisition:approve"),
+
+    PURCHASE_ORDER_READ("purchase-order:read"),
+    PURCHASE_ORDER_WRITE("purchase-order:write"),
+
+    INVOICE_READ("invoice:read"),
+    INVOICE_WRITE("invoice:write"),
+
+    RECORD_DELETE("record:delete"),
+    USER_MANAGE("user:manage");
+
+    private final String authority;
+
+    Permission(String authority) { this.authority = authority; }
+
+    public String authority() { return authority; }
+}</pre></div>
+  <h3>2 · Roles become bundles of permissions</h3>
+<div class="code"><div class="file">model/Role.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.model;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
+import static tz.co.hmy.pis.model.Permission.*;
+
+/**
+ * A role is a named bundle of permissions. Stored by name in app_user_role.role.
+ *
+ * The mapping lives here, in code, so it is reviewed and versioned like code.
+ * Changing who may do what is a one-line change in this file, and no rule in
+ * SecurityConfig or @PreAuthorize has to change. (Exercise 4 moves it into a table.)
+ */
+public enum Role {
+
+    /** Raises requisitions, registers suppliers, prepares orders and invoices. */
+    OFFICER(EnumSet.of(
+            SUPPLIER_READ, SUPPLIER_WRITE,
+            REQUISITION_READ, REQUISITION_WRITE,
+            PURCHASE_ORDER_READ, PURCHASE_ORDER_WRITE,
+            INVOICE_READ, INVOICE_WRITE)),
+
+    /** Approves what officers raise. Reads everything, writes nothing. */
+    APPROVER(EnumSet.of(
+            SUPPLIER_READ, SUPPLIER_APPROVE,
+            REQUISITION_READ, REQUISITION_APPROVE,
+            PURCHASE_ORDER_READ,
+            INVOICE_READ)),
+
+    ADMIN(EnumSet.allOf(Permission.class));
+
+    private final Set&lt;Permission&gt; permissions;
+
+    Role(Set&lt;Permission&gt; permissions) { this.permissions = Collections.unmodifiableSet(permissions); }
+
+    public Set&lt;Permission&gt; permissions() { return permissions; }
+}</pre></div>
+  <h3>3 · One place that turns roles into authorities</h3>
+  <p>Basic logins, JWTs and tests all need the same answer, so it lives in one class.</p>
+<div class="code"><div class="file">security/Authorities.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.security;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import tz.co.hmy.pis.model.Permission;
+import tz.co.hmy.pis.model.Role;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+/**
+ * Roles → authorities, in one place, for every way of logging in.
+ *
+ * Each role becomes ROLE_&lt;name&gt; (so hasRole still works) and each of its
+ * permissions becomes its own authority (for hasAuthority).
+ */
+public final class Authorities {
+
+    private Authorities() { }
+
+    public static List&lt;GrantedAuthority&gt; of(Collection&lt;Role&gt; roles) {
+        Stream&lt;String&gt; roleNames = roles.stream().map(role -&gt; "ROLE_" + role.name());
+        return Stream.concat(roleNames, permissions(roles).stream())
+                .distinct()
+                .sorted()
+                .&lt;GrantedAuthority&gt;map(SimpleGrantedAuthority::new)
+                .toList();
+    }
+
+    /** The union of every role's permissions, e.g. ["requisition:approve", "supplier:read", ...]. */
+    public static List&lt;String&gt; permissions(Collection&lt;Role&gt; roles) {
+        return roles.stream()
+                .flatMap(role -&gt; role.permissions().stream())
+                .map(Permission::authority)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+}</pre></div>
+  <h3>4 · Basic logins get the permissions</h3>
+<div class="code"><div class="file">service/DatabaseUserDetailsService.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tz.co.hmy.pis.model.AppUser;
+import tz.co.hmy.pis.repository.AppUserRepository;
+import tz.co.hmy.pis.security.Authorities;
+
+/**
+ * The bridge between our app_user table and Spring Security.
+ *
+ * Spring calls loadUserByUsername on every request that carries a Basic header,
+ * then compares the password it was sent with the hash we return here.
+ * We never compare passwords ourselves.
+ */
+@RequiredArgsConstructor
+@Service
+public class DatabaseUserDetailsService implements UserDetailsService {
+
+    private final AppUserRepository users;
+
+    @Override
+    @Transactional(readOnly = true) // roles are lazy; read them while the session is open
+    public UserDetails loadUserByUsername(String username) {
+        AppUser user = users.findByUsername(username.toLowerCase())
+                // Same 401 as a wrong password: never tell a caller which usernames exist.
+                .orElseThrow(() -&gt; new UsernameNotFoundException("Bad credentials"));
+
+        return User.withUsername(user.getUsername())
+                .password(user.getPasswordHash())
+                // Not .roles(...): in this builder, roles() and authorities() replace
+                // each other, and whichever is called last wins.
+                .authorities(Authorities.of(user.getRoles()))
+                .disabled(!user.isEnabled())
+                .build();
+    }
+}</pre></div>
+  <div class="note warn"><b>roles() and authorities() replace each other</b>In Spring's <code>User</code> builder, whichever is called last wins. Call <code>.roles("APPROVER")</code> after <code>.authorities(...)</code> and the user has no permissions at all.</div>
+  <h3>5 · Tokens carry the permissions too</h3>
+  <p><code>TokenService</code> gets one new <code>.claim(...)</code> line in <code>issue(...)</code>, and the import <code>tz.co.hmy.pis.security.Authorities</code>:</p>
+<div class="code"><div class="file">service/TokenService.java — changed part</div><pre data-lang="java">JwtClaimsSet claims = JwtClaimsSet.builder()
+        .issuer("pis")
+        .subject(user.getUsername())      // becomes Authentication.getName() on later requests
+        .issuedAt(now)
+        .expiresAt(now.plus(properties.expiry()))
+        .claim("roles", roles)
+        .claim("permissions", Authorities.permissions(user.getRoles()))   // what the user may DO
+        .build();</pre></div><div class="code"><div class="file">config/JwtConfig.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.config;
+
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * One secret key, used twice: the encoder signs tokens at login, the decoder
+ * checks the signature on every request. HS256 is symmetric, so whoever holds
+ * the secret can both issue and verify. It never leaves the server.
+ */
+@Configuration
+@EnableConfigurationProperties(JwtProperties.class)
+public class JwtConfig {
+
+    @Bean
+    public SecretKey jwtSigningKey(JwtProperties properties) {
+        byte[] bytes = properties.secret().getBytes(StandardCharsets.UTF_8);
+        if (bytes.length &lt; 32) {
+            // HS256 is only as strong as its key: 256 bits minimum.
+            throw new IllegalStateException("JWT_SECRET must be at least 32 bytes; got " + bytes.length);
+        }
+        return new SecretKeySpec(bytes, "HmacSHA256");
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder(SecretKey jwtSigningKey) {
+        return new NimbusJwtEncoder(new ImmutableSecret&lt;&gt;(jwtSigningKey));
+    }
+
+    /** Checks signature and expiry on every request. A token that fails either is a 401. */
+    @Bean
+    public JwtDecoder jwtDecoder(SecretKey jwtSigningKey) {
+        return NimbusJwtDecoder.withSecretKey(jwtSigningKey)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+    }
+
+    /**
+     * Two claims become authorities:
+     *   "roles":       ["APPROVER"]              → ROLE_APPROVER
+     *   "permissions": ["requisition:approve"]   → requisition:approve
+     * so hasRole(...) and hasAuthority(...) work the same with a token as with Basic.
+     */
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();
+        roles.setAuthoritiesClaimName("roles");
+        roles.setAuthorityPrefix("ROLE_");
+
+        JwtGrantedAuthoritiesConverter permissions = new JwtGrantedAuthoritiesConverter();
+        permissions.setAuthoritiesClaimName("permissions");
+        permissions.setAuthorityPrefix("");                  // the permission IS the authority
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -&gt; {
+            Collection&lt;GrantedAuthority&gt; authorities = new ArrayList&lt;&gt;(roles.convert(jwt));
+            authorities.addAll(permissions.convert(jwt));
+            return authorities;
+        });
+        return converter;
+    }
+}</pre></div>
+  <h3>6 · URL rules check permissions</h3>
+  <p>Compare <code>authorizeHttpRequests</code> with Lesson 3B: not one <code>hasRole</code> is left.</p>
+<div class="code"><div class="file">config/SecurityConfig.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.config;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * Two ways to prove who you are, both checked by the same rules:
+ *
+ *   Authorization: Basic base64(username:password)   password on every request (Lessons 1-2)
+ *   Authorization: Bearer &lt;JWT&gt;                      password once, at POST /api/v1/auth/login
+ *
+ * Base64 and JWT payloads are both readable by anyone, so either is only safe over HTTPS.
+ *
+ * Two separate questions, answered in two separate places:
+ *   Authentication — who are you?       DatabaseUserDetailsService + passwordEncoder()
+ *   Authorization  — what may you do?   the rules in filterChain()
+ *
+ * Users live in the app_user table. DatabaseUserDetailsService is the only
+ * UserDetailsService bean, so Spring Security picks it up without being told.
+ */
+@Configuration
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final ProblemDetailSecurityHandler problemHandler;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                // CSRF protects browser sessions that send cookies automatically.
+                // This API has no session and no cookie, so there is nothing to forge.
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -&gt; s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Rules are checked top to bottom and the FIRST match wins,
+                // so specific paths go above general ones.
+                .authorizeHttpRequests(auth -&gt; auth
+                        .requestMatchers("/actuator/health", "/swagger-ui.html", "/swagger-ui/**",
+                                "/v3/api-docs/**").permitAll()
+
+                        // You can't need a token to get a token. For refresh and logout,
+                        // the refresh token in the request body is the credential.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login",
+                                "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
+
+                        // Anyone logged in may ask who they are.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
+
+                        // From here on, every rule names a PERMISSION, never a role.
+                        // Which roles hold which permission is decided once, in Role.
+                        .requestMatchers("/api/v1/users/**").hasAuthority("user:manage")
+
+                        // Specific actions first: the first match wins.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/requisitions/*/approve",
+                                "/api/v1/requisitions/*/reject").hasAuthority("requisition:approve")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/suppliers/*/status").hasAuthority("supplier:approve")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").hasAuthority("record:delete")
+
+                        // Then read and write, one pair per resource.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/suppliers/**").hasAuthority("supplier:read")
+                        .requestMatchers("/api/v1/suppliers/**").hasAuthority("supplier:write")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/requisitions/**").hasAuthority("requisition:read")
+                        .requestMatchers("/api/v1/requisitions/**").hasAuthority("requisition:write")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/purchase-orders/**").hasAuthority("purchase-order:read")
+                        .requestMatchers("/api/v1/purchase-orders/**").hasAuthority("purchase-order:write")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/invoices/**").hasAuthority("invoice:read")
+                        .requestMatchers("/api/v1/invoices/**").hasAuthority("invoice:write")
+
+                        // Anything not listed above is refused rather than left open.
+                        .anyRequest().denyAll())
+
+                .httpBasic(basic -&gt; basic.authenticationEntryPoint(problemHandler))
+
+                // Reads "Authorization: Bearer ...", checks signature and expiry with the
+                // JwtDecoder bean, and turns the roles claim into ROLE_ authorities.
+                .oauth2ResourceServer(jwt -&gt; jwt
+                        .jwt(j -&gt; j.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                        .authenticationEntryPoint(problemHandler)   // bad or expired token
+                        .accessDeniedHandler(problemHandler))
+                .exceptionHandling(ex -&gt; ex
+                        .authenticationEntryPoint(problemHandler)   // 401: who are you?
+                        .accessDeniedHandler(problemHandler))       // 403: I know you, but no
+                .build();
+    }
+
+    /**
+     * The same AuthenticationManager that HTTP Basic uses (DatabaseUserDetailsService
+     * + BCrypt), exposed so TokenService can check a password at login.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    /**
+     * BCrypt by default. Hashes are stored with a prefix, e.g. {bcrypt}$2a$10$...,
+     * so the algorithm can be changed later without invalidating existing passwords.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+}</pre></div>
+  <h3>7 · Turn on method security</h3>
+<div class="code"><div class="file">config/MethodSecurityConfig.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
+/**
+ * Turns on @PreAuthorize. URL rules in SecurityConfig stay the first line of
+ * defence; method rules protect the service itself, whichever controller,
+ * job or future endpoint calls it.
+ */
+@Configuration
+@EnableMethodSecurity
+public class MethodSecurityConfig { }</pre></div>
+  <div class="note warn"><b>Without it, every @PreAuthorize is silently ignored</b>No error, no warning: the method just runs. Exercise 3.</div>
+  <h3>8 · The guard: a rule that reads the record</h3>
+<div class="code"><div class="file">security/RequisitionGuard.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.security;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import tz.co.hmy.pis.repository.RequisitionRepository;
+
+import java.util.UUID;
+
+/**
+ * Rules that depend on the DATA, not just on who the user is.
+ *
+ * Called from @PreAuthorize as  @requisitionGuard.raisedBy(#id, authentication.name).
+ * "raisedBy" means created_by (Lesson 2): the login that created the record,
+ * not the requestedBy text the client typed in.
+ */
+@Component("requisitionGuard")
+@RequiredArgsConstructor
+public class RequisitionGuard {
+
+    private final RequisitionRepository requisitions;
+
+    @Transactional(readOnly = true)
+    public boolean raisedBy(UUID requisitionId, String username) {
+        // An unknown id is "not raised by you": the service then answers 404, not 403.
+        return requisitions.findById(requisitionId)
+                .map(requisition -&gt; username.equals(requisition.getCreatedBy()))
+                .orElse(false);
+    }
+}</pre></div>
+  <h3>9 · <code>@PreAuthorize</code> on the service</h3>
+  <p>Two methods change, plus the import <code>org.springframework.security.access.prepost.PreAuthorize</code>:</p>
+<div class="code"><div class="file">service/RequisitionService.java — changed part</div><pre data-lang="java">/**
+ * Two checks before the method runs: the permission, and separation of
+ * duties. Whoever raised a requisition may not approve it, even an admin
+ * who holds every permission.
+ */
+@PreAuthorize("hasAuthority('requisition:approve') and !@requisitionGuard.raisedBy(#id, authentication.name)")
+@Transactional
+public RequisitionResponse approve(UUID id) {
+    Requisition requisition = getWithItems(id);
+    if (requisition.getStatus() != RequisitionStatus.SUBMITTED) {
+        throw new BusinessRuleException("Only a SUBMITTED requisition can be approved");
+    }
+    requisition.approve();
+    return RequisitionResponse.from(requisition);
+}
+
+@PreAuthorize("hasAuthority('requisition:approve') and !@requisitionGuard.raisedBy(#id, authentication.name)")
+@Transactional
+public RequisitionResponse reject(UUID id) {
+    Requisition requisition = getWithItems(id);
+    if (requisition.getStatus() != RequisitionStatus.SUBMITTED) {
+        throw new BusinessRuleException("Only a SUBMITTED requisition can be rejected");
+    }
+    requisition.reject();
+    return RequisitionResponse.from(requisition);
+}</pre></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>hasAuthority('requisition:approve')</code></td><td>The same check as the URL rule, now on the service itself</td></tr>
+      <tr><td><code>@requisitionGuard</code></td><td>The Spring bean named <code>requisitionGuard</code></td></tr>
+      <tr><td><code>#id</code></td><td>The method's <code>id</code> argument</td></tr>
+      <tr><td><code>authentication.name</code></td><td>The logged-in username, Basic or JWT</td></tr>
+      <tr><td><code>!</code></td><td>"…and the user did <strong>not</strong> raise it"</td></tr>
+    </tbody>
+  </table></div>
+  <h3>10 · A denied method call is a 403</h3>
+  <p>One new handler above the catch-all, plus the import <code>org.springframework.security.access.AccessDeniedException</code>:</p>
+<div class="code"><div class="file">exception/GlobalExceptionHandler.java — changed part</div><pre data-lang="java">/**
+ * A @PreAuthorize rule said no. That happens INSIDE the service, so unlike a
+ * URL rule the exception reaches this class, and without this handler the
+ * catch-all below would turn it into a 500.
+ */
+@ExceptionHandler(AccessDeniedException.class)
+public ProblemDetail onAccessDenied(AccessDeniedException ex) {
+    return problem(HttpStatus.FORBIDDEN, "Access denied",
+            "You may not perform this operation on this record", "forbidden");
+}</pre></div>
+  <h3>11 · Show permissions and authors</h3>
+<div class="code"><div class="file">dto/UserResponse.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.dto;
+
+import tz.co.hmy.pis.model.AppUser;
+import tz.co.hmy.pis.model.Role;
+import tz.co.hmy.pis.security.Authorities;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+/** No password and no hash. There is no reason for either to ever leave the server. */
+public record UserResponse(
+        UUID id,
+        String username,
+        String fullName,
+        boolean enabled,
+        Set&lt;Role&gt; roles,
+        List&lt;String&gt; permissions,
+        Instant createdAt,
+        String createdBy
+) {
+    public static UserResponse from(AppUser u) {
+        return new UserResponse(u.getId(), u.getUsername(), u.getFullName(), u.isEnabled(),
+                Set.copyOf(u.getRoles()), Authorities.permissions(u.getRoles()),
+                u.getCreatedAt(), u.getCreatedBy());
+    }
+}</pre></div><div class="code"><div class="file">dto/RequisitionResponse.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis.dto;
+
+import tz.co.hmy.pis.model.Requisition;
+import tz.co.hmy.pis.model.RequisitionStatus;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+public record RequisitionResponse(
+        UUID id,
+        String reference,
+        String department,
+        String requestedBy,
+        RequisitionStatus status,
+        String justification,
+        LocalDate requiredByDate,
+        BigDecimal estimatedTotal,
+        List&lt;RequisitionItemResponse&gt; items,
+        Instant createdAt,
+        Instant updatedAt,
+        String createdBy,       // the login that raised it: the approval rule checks this
+        String updatedBy
+) {
+    public static RequisitionResponse from(Requisition r) {
+        return new RequisitionResponse(
+                r.getId(), r.getReference(), r.getDepartment(), r.getRequestedBy(),
+                r.getStatus(), r.getJustification(), r.getRequiredByDate(),
+                r.getEstimatedTotal(),
+                r.getItems().stream().map(RequisitionItemResponse::from).toList(),
+                r.getCreatedAt(), r.getUpdatedAt(),
+                r.getCreatedBy(), r.getUpdatedBy());
+    }
+}</pre></div>
+</section>
+
+<section id="l3c-demo">
+  <h2 class="s"><span class="n">TRY IT</span>Someone else's requisition, then your own</h2>
+<div class="code"><div class="file">terminal: set up</div><pre data-lang="sh" data-tpl>JSON='Content-Type: application/json'
+token() { curl -s -X POST {{BASE}}/api/v1/auth/login -H "$JSON" \
+  -d "{\"username\":\"$1\",\"password\":\"$2\"}" | jq -r .accessToken; }
+ADMIN=$(token admin '{{ADMIN}}'); OFFICER=$(token officer '{{OFFICER}}'); APPROVER=$(token approver '{{APPROVER}}')
+REQ='{"department":"ICT","requestedBy":"Neema Said","justification":"Laptops","requiredByDate":"2030-12-31",
+      "items":[{"description":"Laptop","quantity":1,"unit":"PIECE","estimatedUnitPrice":2500000.00}]}'</pre></div>
+  <h3>What may the approver do?</h3>
+<div class="code"><div class="file">terminal</div><pre data-lang="sh" data-tpl>curl -s -H "Authorization: Bearer $APPROVER" {{BASE}}/api/v1/users/me | jq -c '{roles, permissions}'</pre></div><div class="out">{"roles":["APPROVER"],"permissions":["invoice:read","purchase-order:read","requisition:approve","requisition:read","supplier:approve","supplier:read"]}</div>
+  <h3>An officer raises one, the approver approves it</h3>
+<div class="code"><div class="file">terminal</div><pre data-lang="sh" data-tpl>ID=$(curl -s -X POST -H "$JSON" -H "Authorization: Bearer $OFFICER" -d "$REQ" \
+  {{BASE}}/api/v1/requisitions | jq -r .id)
+curl -s -X POST -H "Authorization: Bearer $OFFICER" {{BASE}}/api/v1/requisitions/$ID/submit | jq -c '{status, createdBy}'
+curl -s -X POST -H "Authorization: Bearer $APPROVER" {{BASE}}/api/v1/requisitions/$ID/approve | jq -c '{status}'</pre></div><div class="out">{"status":"SUBMITTED","createdBy":"officer"}
+{"status":"APPROVED"}</div>
+  <h3>The admin raises one and tries to approve it</h3>
+<div class="code"><div class="file">terminal</div><pre data-lang="sh" data-tpl>ID=$(curl -s -X POST -H "$JSON" -H "Authorization: Bearer $ADMIN" -d "$REQ" \
+  {{BASE}}/api/v1/requisitions | jq -r .id)
+curl -s -o /dev/null -X POST -H "Authorization: Bearer $ADMIN" {{BASE}}/api/v1/requisitions/$ID/submit
+curl -s -X POST -H "Authorization: Bearer $ADMIN" {{BASE}}/api/v1/requisitions/$ID/approve | jq -c '{status, title, detail}'</pre></div><div class="out"><span class="st s403">403</span>  {"status":403,"title":"Access denied","detail":"You may not perform this operation on this record"}</div>
+  <p>The admin holds <code>requisition:approve</code>, so the URL rule let the request through. The <strong>method rule</strong> refused it, because <code>created_by</code> is <code>admin</code>. Ask the class why this matters more for an admin than for anyone else.</p>
+</section>
+
+<section id="l3c-tests">
+  <h2 class="s"><span class="n">TEST IT</span>Tests must use the real permissions</h2>
+  <p>After step 6, <strong>every test using <code>@WithMockUser(roles = "OFFICER")</code> fails with 403</strong>: that fake user has <code>ROLE_OFFICER</code> and nothing else. Tests that log in for real keep passing, because real logins go through <code>Authorities</code>. So the fake user is built from the <strong>same</strong> mapping:</p>
+<div class="code"><div class="file">(test) WithRole.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis;
+
+import org.springframework.security.test.context.support.WithSecurityContext;
+import tz.co.hmy.pis.model.Role;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Like @WithMockUser(roles = "OFFICER"), but the fake user also gets every
+ * permission Role.OFFICER has, taken from the same mapping production uses.
+ *
+ * @WithMockUser(roles = ...) gives ONLY "ROLE_OFFICER", which no
+ * hasAuthority("supplier:write") rule accepts.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@WithSecurityContext(factory = WithRoleSecurityContextFactory.class)
+public @interface WithRole {
+
+    Role value();
+
+    /** Defaults to the role name in lower case: "officer", "approver", "admin". */
+    String username() default "";
+}</pre></div><div class="code"><div class="file">(test) WithRoleSecurityContextFactory.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import tz.co.hmy.pis.security.Authorities;
+
+import java.util.List;
+import java.util.Set;
+
+public class WithRoleSecurityContextFactory implements WithSecurityContextFactory&lt;WithRole&gt; {
+
+    @Override
+    public SecurityContext createSecurityContext(WithRole withRole) {
+        String username = withRole.username().isEmpty()
+                ? withRole.value().name().toLowerCase()
+                : withRole.username();
+        List&lt;GrantedAuthority&gt; authorities = Authorities.of(Set.of(withRole.value()));
+
+        User principal = new User(username, "not-used", authorities);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(principal, null, authorities));
+        return context;
+    }
+}</pre></div>
+  <p>In <code>SupplierApiTest</code> and <code>SecurityTest</code>, replace every <code>@WithMockUser(roles = "X")</code> with <code>@WithRole(Role.X)</code> and import <code>tz.co.hmy.pis.model.Role</code>. In <code>JwtTest</code>, the <code>jwt()</code> test needs the permissions too:</p>
+<div class="code"><div class="file">(test) JwtTest.java — changed part</div><pre data-lang="java">/**
+ * jwt() skips login and signing entirely, like @WithRole does for Basic.
+ * It needs the permissions too (Lesson 3C): a bare ROLE_ADMIN can't delete.
+ */
+@Test
+void jwt_post_processor_tests_rules_without_logging_in() throws Exception {
+    mvc.perform(delete("/api/v1/suppliers/{id}", UNKNOWN_ID)
+            .with(jwt().authorities(Authorities.of(Set.of(Role.OFFICER)))))
+        .andExpect(status().isForbidden());
+    mvc.perform(delete("/api/v1/suppliers/{id}", UNKNOWN_ID)
+            .with(jwt().authorities(Authorities.of(Set.of(Role.ADMIN)))))
+        .andExpect(status().isNotFound());
+}</pre></div>
+  <h3><code>PermissionTest</code>: 8 new tests</h3>
+<div class="code"><div class="file">(test) PermissionTest.java — complete file</div><pre data-lang="java">package tz.co.hmy.pis;
+
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import tz.co.hmy.pis.model.AppUser;
+import tz.co.hmy.pis.model.Permission;
+import tz.co.hmy.pis.model.Role;
+import tz.co.hmy.pis.repository.AppUserRepository;
+import tz.co.hmy.pis.service.RequisitionService;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Permissions (who may do WHAT) and method security (rules on the service,
+ * including rules that look at the record itself).
+ */
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+class PermissionTest {
+
+    private static final String REQUISITION = """
+            { "department": "ICT", "requestedBy": "Neema Said",
+              "justification": "Laptops for the new procurement officers",
+              "requiredByDate": "2030-12-31",
+              "items": [ { "description": "Laptop", "quantity": 2,
+                           "unit": "PIECE", "estimatedUnitPrice": 2500000.00 } ] }
+            """;
+
+    @Autowired MockMvc mvc;
+    @Autowired AppUserRepository users;
+    @Autowired PasswordEncoder encoder;
+    @Autowired RequisitionService requisitions;
+
+    @BeforeEach
+    void createUsers() {
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
+        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of(Role.APPROVER)));
+    }
+
+    /** Creates and submits a requisition as the given user; returns its id. */
+    private String raiseAndSubmit(String username, String password) throws Exception {
+        String body = mvc.perform(post("/api/v1/requisitions").with(httpBasic(username, password))
+                        .contentType(MediaType.APPLICATION_JSON).content(REQUISITION))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.createdBy").value(username))
+                .andReturn().getResponse().getContentAsString();
+        String id = JsonPath.read(body, "$.id");
+        mvc.perform(post("/api/v1/requisitions/{id}/submit", id).with(httpBasic(username, password)))
+            .andExpect(status().isOk());
+        return id;
+    }
+
+    // ---------------------------------------------------------------- the mapping
+
+    @Test
+    void roles_are_bundles_of_permissions() {
+        assertThat(Role.APPROVER.permissions())
+            .contains(Permission.REQUISITION_APPROVE, Permission.SUPPLIER_APPROVE)
+            .doesNotContain(Permission.REQUISITION_WRITE, Permission.SUPPLIER_WRITE, Permission.RECORD_DELETE);
+        assertThat(Role.OFFICER.permissions())
+            .contains(Permission.REQUISITION_WRITE)
+            .doesNotContain(Permission.REQUISITION_APPROVE);
+        assertThat(Role.ADMIN.permissions()).containsExactlyInAnyOrder(Permission.values());
+    }
+
+    @Test
+    void me_lists_the_permissions_a_login_brings() throws Exception {
+        mvc.perform(get("/api/v1/users/me").with(httpBasic("approver", "approver-pass")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.roles[0]").value("APPROVER"))
+            .andExpect(jsonPath("$.permissions").value(org.hamcrest.Matchers.hasItems(
+                    "requisition:approve", "supplier:approve", "supplier:read")))
+            .andExpect(jsonPath("$.permissions").value(org.hamcrest.Matchers.not(
+                    org.hamcrest.Matchers.hasItem("supplier:write"))));
+    }
+
+    @Test
+    void the_token_carries_the_permissions_too() throws Exception {
+        String body = mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"username\": \"approver\", \"password\": \"approver-pass\" }"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String token = JsonPath.read(body, "$.accessToken");
+        String claims = new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8);
+
+        assertThat(claims).contains("\"permissions\"").contains("requisition:approve");
+
+        // and a token-only request is judged by those permissions
+        mvc.perform(patch("/api/v1/suppliers/{id}/status", "33333333-3333-3333-3333-333333333333")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON).content("{ \"status\": \"ACTIVE\" }"))
+            .andExpect(status().isOk());
+    }
+
+    // ---------------------------------------------------------------- URL rules
+
+    @Test
+    void permission_rules_behave_like_the_old_role_rules() throws Exception {
+        mvc.perform(patch("/api/v1/suppliers/{id}/status", "33333333-3333-3333-3333-333333333333")
+                .with(httpBasic("officer", "officer-pass"))
+                .contentType(MediaType.APPLICATION_JSON).content("{ \"status\": \"ACTIVE\" }"))
+            .andExpect(status().isForbidden());                     // officer: no supplier:approve
+        mvc.perform(post("/api/v1/requisitions").with(httpBasic("approver", "approver-pass"))
+                .contentType(MediaType.APPLICATION_JSON).content(REQUISITION))
+            .andExpect(status().isForbidden());                     // approver: no requisition:write
+    }
+
+    // ---------------------------------------------------------------- method security
+
+    @Test
+    void an_approver_approves_an_officers_requisition() throws Exception {
+        String id = raiseAndSubmit("officer", "officer-pass");
+
+        mvc.perform(post("/api/v1/requisitions/{id}/approve", id).with(httpBasic("approver", "approver-pass")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    void nobody_approves_their_own_requisition_not_even_an_admin() throws Exception {
+        String id = raiseAndSubmit("admin", "admin-pass");         // admin holds every permission
+
+        mvc.perform(post("/api/v1/requisitions/{id}/approve", id).with(httpBasic("admin", "admin-pass")))
+            .andExpect(status().isForbidden())                      // 403, not 500
+            .andExpect(jsonPath("$.title").value("Access denied"))
+            .andExpect(jsonPath("$.type").value("https://hmy.co.tz/problems/forbidden"));
+        mvc.perform(post("/api/v1/requisitions/{id}/reject", id).with(httpBasic("admin", "admin-pass")))
+            .andExpect(status().isForbidden());
+
+        // someone else with the permission may
+        mvc.perform(post("/api/v1/requisitions/{id}/approve", id).with(httpBasic("approver", "approver-pass")))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void an_unknown_requisition_is_still_404() throws Exception {
+        mvc.perform(post("/api/v1/requisitions/{id}/approve", UUID.randomUUID())
+                .with(httpBasic("approver", "approver-pass")))
+            .andExpect(status().isNotFound());
+    }
+
+    /** No HTTP at all: the rule is on the service, so a batch job or another service hits it too. */
+    @Test
+    @WithRole(Role.OFFICER)
+    void the_service_itself_refuses_without_the_permission() {
+        assertThatThrownBy(() -&gt; requisitions.approve(UUID.randomUUID()))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+}</pre></div><div class="out">mvn test  →  SecurityTest 12 · UserApiTest 9 · JwtTest 9 · RefreshTokenTest 9 · PermissionTest 8 · SupplierApiTest 6 · InvoiceRepositoryTest 3  →  Tests run: 56, Failures: 0</div>
+</section>
+
+<section id="l3c-mistakes">
+  <h2 class="s"><span class="n">MISTAKES</span>What usually goes wrong</h2>
+  <details><summary>Every <code>@WithMockUser(roles = …)</code> test fails with 403</summary><div class="body"><p>It gives only <code>ROLE_OFFICER</code>. Use <code>@WithRole(Role.OFFICER)</code>, which adds the role's permissions from the real mapping.</p></div></details>
+  <details><summary>A user logs in fine, but every permission rule says 403</summary><div class="body"><p><code>.roles(...)</code> is called after <code>.authorities(...)</code>, or used alone. The last one wins. Use <code>.authorities(Authorities.of(user.getRoles()))</code> only.</p></div></details>
+  <details><summary>Basic logins work, but tokens get 403</summary><div class="body"><p>The token has no <code>permissions</code> claim, or <code>JwtConfig</code> doesn't read it. Without <code>setAuthorityPrefix("")</code> every permission arrives as <code>SCOPE_requisition:approve</code>.</p></div></details>
+  <details><summary><code>@PreAuthorize</code> seems to be ignored</summary><div class="body"><p><code>@EnableMethodSecurity</code> is missing, and nothing warns you. The same happens when a method calls another method <strong>in the same class</strong>: the check sits on the Spring proxy, and <code>this.approve(id)</code> skips it.</p></div></details>
+  <details><summary>A denied approval returns 500</summary><div class="body"><p>No <code>@ExceptionHandler(AccessDeniedException.class)</code>, so the catch-all handled it. Step 10.</p></div></details>
+  <details><summary>The admin can approve their own requisition</summary><div class="body"><p>The guard compares <code>requestedBy</code>, free text from the client, instead of <code>createdBy</code>, the login. Only <code>createdBy</code> can be trusted.</p></div></details>
+</section>
+
+<section id="l3c-exercises">
+  <h2 class="s"><span class="n">EXERCISES</span>Now you try</h2>
+  <div class="ex"><h4>1 · Read your permissions <span class="lvl">Warm-up</span></h4>
+    <p>Call <code>/api/v1/users/me</code> as officer, approver and admin, and decode each token. Which permissions does only the admin have? Which role writes nothing? Does the token's <code>permissions</code> claim match <code>/me</code>?</p>
+    <details><summary>Solution</summary><div class="body"><p>Only admin: <code>record:delete</code>, <code>user:manage</code>. <code>APPROVER</code> writes nothing: it has only <code>…:read</code> and <code>…:approve</code>. The lists match, because both come from <code>Authorities.permissions(...)</code>.</p></div></details></div>
+  <div class="ex"><h4>2 · Break it: remove the 403 handler <span class="lvl">Understanding</span></h4>
+    <p>Delete the <code>AccessDeniedException</code> handler. Run <code>mvn test</code>. What fails, and with what status?</p>
+    <details><summary>Solution</summary><div class="body"><div class="out">nobody_approves_their_own_requisition_not_even_an_admin -> Status expected:&lt;403&gt; but was:&lt;500&gt;</div><p>The URL rule passed; the method rule threw inside the controller call; the catch-all made it a 500. URL-rule 403s aren't affected, because they never reach <code>GlobalExceptionHandler</code>.</p></div></details></div>
+  <div class="ex"><h4>3 · Break it: forget <code>@EnableMethodSecurity</code> <span class="lvl">Understanding</span></h4>
+    <p>Remove it and run <code>mvn test</code>. Why is this worse than Exercise 2?</p>
+    <details><summary>Solution</summary><div class="body"><div class="out">nobody_approves_their_own_requisition_not_even_an_admin -> Status expected:&lt;403&gt; but was:&lt;200&gt;
+the_service_itself_refuses_without_the_permission       -> Expecting actual throwable to be an instance of AccessDeniedException</div><p><strong>The admin approves their own requisition.</strong> Every <code>@PreAuthorize</code> is silently ignored. Exercise 2's bug was loud; this one is silent, and only a test that expects a refusal catches it.</p></div></details></div>
+  <div class="ex"><h4>4 · A read-only auditor <span class="lvl">Core</span></h4>
+    <p>Add an <code>AUDITOR</code> role that reads everything and changes nothing, and prove it with a test. How many rules did you change?</p>
+    <details><summary>Solution</summary><div class="body"><div class="code"><div class="file">model/Role.java — add above ADMIN</div><pre data-lang="java">/** Reads everything, changes nothing. */
+AUDITOR(EnumSet.of(SUPPLIER_READ, REQUISITION_READ, PURCHASE_ORDER_READ, INVOICE_READ)),</pre></div><div class="code"><div class="file">(test) AuditorExerciseTest.java — the test</div><pre data-lang="java">@Test
+@WithRole(Role.AUDITOR)
+void an_auditor_reads_everything_and_changes_nothing() throws Exception {
+    mvc.perform(get("/api/v1/suppliers")).andExpect(status().isOk());
+    mvc.perform(get("/api/v1/requisitions")).andExpect(status().isOk());
+    mvc.perform(get("/api/v1/purchase-orders")).andExpect(status().isOk());
+    mvc.perform(get("/api/v1/invoices")).andExpect(status().isOk());
+    mvc.perform(post("/api/v1/suppliers").contentType(MediaType.APPLICATION_JSON).content("{}"))
+        .andExpect(status().isForbidden());
+    mvc.perform(post("/api/v1/requisitions/{id}/approve", "99999999-9999-9999-9999-999999999999"))
+        .andExpect(status().isForbidden());
+    mvc.perform(get("/api/v1/users")).andExpect(status().isForbidden());
+}</pre></div><p><strong>No rule changes.</strong> That's the point of permissions.</p></div></details></div>
+  <div class="ex"><h4>5 · The mapping in a table <span class="lvl">Stretch · design</span></h4>
+    <p>Let an admin change the role → permission mapping without a release. What tables? Which one class reads them? A permission is removed from a role: when does a Basic user lose it, and when does a JWT user?</p>
+    <details><summary>Discussion points</summary><div class="body"><p><code>role</code> and <code>role_permission (role, permission)</code>; keep <code>Permission</code> as an enum, because a new permission always comes with new code. Only <code>Authorities</code> changes. Basic: on the next request. JWT: at the next refresh, at most 5 minutes (Lesson 3B). This one is a design discussion, with no reference solution in the project.</p></div></details></div>
+</section>
+
+<section id="l3c-quiz" class="quiz">
+  <h2 class="s"><span class="n">QUIZ</span>Check yourself</h2>
+  <form class="quiz-form" id="quiz-3c">
+<div class="q" data-answer="b"><p>1. What is the main weakness of <code>hasRole("APPROVER")</code> in a rule?</p><label><input type="radio" name="l3cq1" value="a" id="l3cq1a"> It's slower than <code>hasAuthority</code></label><label><input type="radio" name="l3cq1" value="b" id="l3cq1b"> It names a job title, so changing who may do what means changing rules</label><label><input type="radio" name="l3cq1" value="c" id="l3cq1c"> It doesn't work with JWTs</label><div class="why" hidden>Permissions let the mapping change without touching rules.</div></div><div class="q" data-answer="b"><p>2. Where does the mapping "APPROVER may <code>requisition:approve</code>" live?</p><label><input type="radio" name="l3cq2" value="a" id="l3cq2a"> In every URL rule</label><label><input type="radio" name="l3cq2" value="b" id="l3cq2b"> In <code>Role</code>, used by <code>Authorities</code></label><label><input type="radio" name="l3cq2" value="c" id="l3cq2c"> In the JWT secret</label><div class="why" hidden>One mapping, used by Basic logins, tokens and tests alike.</div></div><div class="q" data-answer="b"><p>3. Why is "you may not approve your own requisition" a <code>@PreAuthorize</code> rule?</p><label><input type="radio" name="l3cq3" value="a" id="l3cq3a"> URL rules can't use <code>and</code></label><label><input type="radio" name="l3cq3" value="b" id="l3cq3b"> It depends on the record's <code>created_by</code>, which a URL rule can't see</label><label><input type="radio" name="l3cq3" value="c" id="l3cq3c"> <code>@PreAuthorize</code> is faster</label><div class="why" hidden>Attribute-based: the answer depends on the data.</div></div><div class="q" data-answer="c"><p>4. A <code>@PreAuthorize</code> rule refuses. Without a handler, what status does PIS return?</p><label><input type="radio" name="l3cq4" value="a" id="l3cq4a"> 401</label><label><input type="radio" name="l3cq4" value="b" id="l3cq4b"> 403</label><label><input type="radio" name="l3cq4" value="c" id="l3cq4c"> 500</label><div class="why" hidden>The exception is thrown inside the controller call, and the catch-all makes it a 500.</div></div><div class="q" data-answer="b"><p>5. You forget <code>@EnableMethodSecurity</code>. What happens?</p><label><input type="radio" name="l3cq5" value="a" id="l3cq5a"> The app won't start</label><label><input type="radio" name="l3cq5" value="b" id="l3cq5b"> Every <code>@PreAuthorize</code> is silently ignored</label><label><input type="radio" name="l3cq5" value="c" id="l3cq5c"> Every method returns 403</label><div class="why" hidden>Nothing warns you. Only a test that expects a refusal catches it.</div></div><div class="q" data-answer="b"><p>6. Why does <code>@WithMockUser(roles = "OFFICER")</code> stop working?</p><label><input type="radio" name="l3cq6" value="a" id="l3cq6a"> It was removed from Spring</label><label><input type="radio" name="l3cq6" value="b" id="l3cq6b"> It gives only <code>ROLE_OFFICER</code>, not the officer's permissions</label><label><input type="radio" name="l3cq6" value="c" id="l3cq6c"> It can't be used with <code>@Transactional</code></label><div class="why" hidden>Use <code>@WithRole(Role.OFFICER)</code>.</div></div><div class="q" data-answer="b"><p>7. Why does the guard check <code>createdBy</code> and not <code>requestedBy</code>?</p><label><input type="radio" name="l3cq7" value="a" id="l3cq7a"> <code>requestedBy</code> can be null</label><label><input type="radio" name="l3cq7" value="b" id="l3cq7b"> <code>createdBy</code> is the login, set by the server; <code>requestedBy</code> is whatever the client typed</label><label><input type="radio" name="l3cq7" value="c" id="l3cq7c"> They're always equal</label><div class="why" hidden>Never base a security decision on something the client can type.</div></div>
+    <button type="submit" class="btn">Check answers</button><span class="score" aria-live="polite"></span>
+  </form>
+</section>
+
+<section id="l3c-smoke">
+  <h2 class="s"><span class="n">SMOKE TEST</span>Check the whole lesson in one go</h2>
+  <p>Needs the Lesson 3C code. Creates officer and approver if missing, and two requisitions per run. Save it as a file and run <code>bash smoke.sh</code> while the app is up.</p>
+<div class="code"><div class="file">smoke-lesson3c.sh</div><pre data-lang="sh" data-tpl>#!/usr/bin/env bash
+# Lesson 3C smoke test: permissions and method security.
+# Creates officer and approver if missing, and two requisitions per run.
+BASE={{BASE}}
+JSON='Content-Type: application/json'
+REQ='{"department":"ICT","requestedBy":"Smoke Test","justification":"Lesson 3C smoke test","requiredByDate":"2030-12-31","items":[{"description":"Laptop","quantity":1,"unit":"PIECE","estimatedUnitPrice":2500000.00}]}'
+
+check() {   # check &lt;expected status&gt; &lt;description&gt; &lt;curl args...&gt;
+  local want=$1 desc=$2; shift 2
+  local got; got=$(curl -s -o /dev/null -w '%{http_code}' "$@")
+  if echo "$got" | grep -qE "^($want)$"; then echo "PASS  $got  $desc"; else echo "FAIL  $got  $desc (expected $want)"; fi
+}
+field() { grep -o "\"$1\":\"[^\"]*\"" | head -1 | cut -d'"' -f4; }
+token() { curl -s -X POST -H "$JSON" -d "{\"username\":\"$1\",\"password\":\"$2\"}" "$BASE/api/v1/auth/login" | field accessToken; }
+b64url_decode() { local s; s=$(printf '%s' "$1" | tr '_-' '/+'); while [ $(( ${#s} % 4 )) -ne 0 ]; do s="$s="; done; printf '%s' "$s" | base64 -d; }
+raise() {   # raise &lt;token&gt;  → creates and submits a requisition, prints its id
+  local id; id=$(curl -s -X POST -H "$JSON" -H "Authorization: Bearer $1" -d "$REQ" "$BASE/api/v1/requisitions" | field id)
+  curl -s -o /dev/null -X POST -H "Authorization: Bearer $1" "$BASE/api/v1/requisitions/$id/submit"
+  echo "$id"
+}
+
+echo "--- accounts and permissions"
+ADMIN=$(token admin '{{ADMIN}}')
+check "201|409" "officer account exists"   -H "Authorization: Bearer $ADMIN" -X POST -H "$JSON" \
+      -d '{"username":"officer","password":"{{OFFICER}}","fullName":"Neema Said","roles":["OFFICER"]}' "$BASE/api/v1/users"
+check "201|409" "approver account exists"  -H "Authorization: Bearer $ADMIN" -X POST -H "$JSON" \
+      -d '{"username":"approver","password":"{{APPROVER}}","fullName":"Juma Ali","roles":["APPROVER"]}' "$BASE/api/v1/users"
+OFFICER=$(token officer '{{OFFICER}}'); APPROVER=$(token approver '{{APPROVER}}')
+ME=$(curl -s -H "Authorization: Bearer $APPROVER" "$BASE/api/v1/users/me")
+echo "$ME" | grep -q '"requisition:approve"' &amp;&amp; ! echo "$ME" | grep -q '"requisition:write"' \
+  &amp;&amp; echo "PASS       /me: approver has requisition:approve, not requisition:write" || echo "FAIL       /me: $ME"
+b64url_decode "$(echo "$APPROVER" | cut -d. -f2)" | grep -q '"permissions":\[' \
+  &amp;&amp; echo "PASS       the approver's token carries a permissions claim" || echo "FAIL       no permissions claim"
+
+echo "--- URL rules check permissions"
+check 403 "approver cannot raise a requisition"      -X POST -H "$JSON" -H "Authorization: Bearer $APPROVER" -d "$REQ" "$BASE/api/v1/requisitions"
+R1=$(raise "$OFFICER")
+[ -n "$R1" ] &amp;&amp; echo "PASS       officer raised and submitted requisition ${R1:0:8}…" || echo "FAIL       officer could not raise a requisition"
+check 403 "officer cannot approve"                    -X POST -H "Authorization: Bearer $OFFICER" "$BASE/api/v1/requisitions/$R1/approve"
+check 200 "approver approves the officer's"           -X POST -H "Authorization: Bearer $APPROVER" "$BASE/api/v1/requisitions/$R1/approve"
+
+echo "--- method security: nobody approves their own"
+R2=$(raise "$ADMIN")
+check 403 "admin cannot approve their own (403, not 500)" -X POST -H "Authorization: Bearer $ADMIN" "$BASE/api/v1/requisitions/$R2/approve"
+check 403 "...nor reject it"                          -X POST -H "Authorization: Bearer $ADMIN" "$BASE/api/v1/requisitions/$R2/reject"
+check 200 "approver approves the admin's"             -X POST -H "Authorization: Bearer $APPROVER" "$BASE/api/v1/requisitions/$R2/approve"</pre></div><div class="out" data-result>--- accounts and permissions
+PASS  201  officer account exists
+PASS  201  approver account exists
+PASS       /me: approver has requisition:approve, not requisition:write
+PASS       the approver's token carries a permissions claim
+--- URL rules check permissions
+PASS  403  approver cannot raise a requisition
+PASS       officer raised and submitted requisition b7b1562b…
+PASS  403  officer cannot approve
+PASS  200  approver approves the officer's
+--- method security: nobody approves their own
+PASS  403  admin cannot approve their own (403, not 500)
+PASS  403  ...nor reject it
+PASS  200  approver approves the admin's</div>
+</section>
+
+  </div>
+  <nav class="pager" aria-label="Lesson navigation"><a href="#l3b" class="prev"><span>Previous</span>3B · Refresh tokens</a><a href="#l4" class="next"><span>Next</span>4 · Spring Authorization Server</a></nav>
 </article>
 
 <article class="lesson c-l4" id="l4">
@@ -2629,7 +3701,7 @@ PASS  401  ...and that family stays revoked</div>
     <div class="facts">
       <span><b>Project</b>pis-lecture4-authorization-server/</span>
       <span><b>Markdown</b>pis-lecture4-authorization-server/LECTURE.md</span>
-      <span><b>Check it</b><a href="#l4-smoke">Smoke test</a></span>
+      <span><b>Check it</b><a href="#t-4">Step by step</a> · <a href="#l4-smoke">Smoke test</a></span>
     </div>
   </header>
   <div class="four-scope">
@@ -3444,10 +4516,203 @@ PASS  401  officer token edited to ADMIN</div>
 </section>
 
 </div>
-  <nav class="pager" aria-label="Lesson navigation"><a href="#l3b" class="prev"><span>Previous</span>3B · Refresh tokens</a><span class="next off"><span>Next</span>5 · Keycloak (planned)</span></nav>
+  <nav class="pager" aria-label="Lesson navigation"><a href="#l3c" class="prev"><span>Previous</span>3C · Permissions and method security</a><span class="next off"><span>Next</span>5 · Keycloak (planned)</span></nav>
 </article>
 
-<footer>PIS Security Course · Lessons 1–3B in the PIS project, Lecture 4 in <code>pis-lecture4-authorization-server/</code>. Markdown versions live next to the code.</footer>
+<article class="lesson c-testing" id="testing">
+  <header class="lesson-head"><div class="eyebrow">Testing guide · every lesson</div><h2>Test each lesson, step by step</h2>
+  <p class="lede">Numbered steps for each lesson: the command, what you should see, what it proves, and what to check if it doesn't match. Every "you should see" is the real output of that command, run on the finished demo.</p>
+  <div class="facts"><span><b>Markdown</b>docs/lessons/TESTING.md</span><span><b>Tools</b>curl · jq · openssl · psql</span></div></header>
+<section id="t-setup"><h2 class="s"><span class="n">BEFORE YOU START</span>One terminal, one set of variables</h2>
+<p>Do the steps in order, in <strong>one terminal</strong>: later steps use variables (<code>$TOKEN</code>, <code>$R1</code>, …) that earlier steps set. IDs, tokens, times and the random TIN will differ on your machine; the status codes and fields should not.</p>
+<div class="code"><div class="file">terminal 1: paste once, change what differs</div><pre data-lang="sh">BASE=http://localhost:8080          # your PIS app (the finished demo runs on 8099)
+ADMIN_PW=admin123                   # ADMIN_PASSWORD from .env
+OFFICER_PW=officer123               # Lesson 1: OFFICER_PASSWORD from .env; later: what you create the officer with
+APPROVER_PW=approver123
+ID=99999999-9999-9999-9999-999999999999   # a requisition/supplier id that doesn't exist
+JSON='Content-Type: application/json'
+export PGUSER=postgres DB=pmis      # your database user and database, for the psql steps</pre></div>
+<div class="code"><div class="file">terminal 2: start the app and leave it running</div><pre data-lang="sh">mvn spring-boot:run</pre></div>
+<p class="muted">Run the unit-test steps from the project folder, where <code>pom.xml</code> is.</p></section>
+<section id="t-1"><h2 class="s"><span class="n">LESSON 1</span>HTTP Basic and roles</h2><p><strong>You need:</strong> The Lesson 1 code, and the app running (<code>mvn spring-boot:run</code>).</p>
+<div class="tstep"><h4><span class="snum">1</span>Run this lesson's unit tests</h4><p>They use the test database, not the running app.</p><div class="code"><pre data-lang="sh">mvn test -Dtest=SecurityTest</pre></div><p class="see"><b>You should see</b> <code>Tests run: 12, Failures: 0</code> and <code>BUILD SUCCESS</code>:</p><div class="out">[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> <code>There are test failures</code>: open <code>target/surefire-reports/</code> for the failing test. <code>No tests were executed</code>: this lesson's test class doesn't exist yet.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>The server is up, and health is public</h4><p>Health must answer without a password, or monitoring breaks.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' $BASE/actuator/health</pre></div><p class="see"><b>You should see</b> <code>200</code>:</p><div class="out">200</div><p class="iffail"><b>If not:</b> Connection refused: the app isn't running, or <code>BASE</code> has the wrong port.</p></div>
+<div class="tstep"><h4><span class="snum">3</span>No credentials → 401, with a Basic challenge</h4><p>Proves the API is locked, and tells clients which scheme to use.</p><div class="code"><pre data-lang="sh">curl -s -i $BASE/api/v1/suppliers | grep -E '^HTTP|^WWW-Authenticate'</pre></div><p class="see"><b>You should see</b> <code>HTTP/1.1 401</code> and <code>WWW-Authenticate: Basic realm="pis"</code>:</p><div class="out">HTTP/1.1 401 
+WWW-Authenticate: Basic realm="pis"</div><p class="iffail"><b>If not:</b> <code>200</code>: <code>SecurityConfig</code> isn't loaded, or the rule is <code>permitAll()</code>.</p></div>
+<div class="tstep"><h4><span class="snum">4</span>Wrong password → 401</h4><p>Authentication really checks the password.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -u officer:wrong $BASE/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> <code>401</code>:</p><div class="out">401</div></div>
+<div class="tstep"><h4><span class="snum">5</span>The officer can read</h4><p>A correct login passes, and any role may read.</p><div class="code"><pre data-lang="sh">curl -s -u officer:$OFFICER_PW "$BASE/api/v1/suppliers?size=1" | jq '{totalElements, first: .content[0].name}'</pre></div><p class="see"><b>You should see</b> A <code>totalElements</code> count and a supplier name:</p><div class="out">{
+  "totalElements": 10,
+  "first": "Kisiwa ICT Consultants"
+}</div><p class="iffail"><b>If not:</b> <code>401</code>: <code>OFFICER_PW</code> doesn't match <code>OFFICER_PASSWORD</code> in <code>.env</code>.</p></div>
+<div class="tstep"><h4><span class="snum">6</span>The officer cannot approve → 403</h4><p>Authorization: logged in, but the wrong role.</p><div class="code"><pre data-lang="sh">curl -s -u officer:$OFFICER_PW -X POST $BASE/api/v1/requisitions/$ID/approve | jq '{status, title}'</pre></div><p class="see"><b>You should see</b> <code>403</code>, "Access denied":</p><div class="out">{
+  "status": 403,
+  "title": "Access denied"
+}</div><p class="iffail"><b>If not:</b> <code>404</code>: the approve rule is below a broader rule. The first match wins.</p></div>
+<div class="tstep"><h4><span class="snum">7</span>The approver can approve → 404</h4><p>404 means security let the request through, and the service didn't find the (fake) id. No data changes.</p><div class="code"><pre data-lang="sh">curl -s -u approver:$APPROVER_PW -X POST $BASE/api/v1/requisitions/$ID/approve | jq '{status, title}'</pre></div><p class="see"><b>You should see</b> <code>404</code>, "Resource not found":</p><div class="out">{
+  "status": 404,
+  "title": "Resource not found"
+}</div><p class="iffail"><b>If not:</b> <code>403</code>: the rule uses the wrong role name.</p></div>
+<div class="tstep"><h4><span class="snum">8</span>The approver cannot create a supplier → 403</h4><p>Writes need OFFICER.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -u approver:$APPROVER_PW -X POST -H "$JSON" -d '{}' $BASE/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> <code>403</code>:</p><div class="out">403</div><p class="iffail"><b>If not:</b> <code>400</code>: the write rule is missing, so validation ran instead.</p></div>
+<div class="tstep"><h4><span class="snum">9</span>Only the admin may delete</h4><p>The officer gets 403; the admin gets through to a 404.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w 'officer: %{http_code}\n' -u officer:$OFFICER_PW -X DELETE $BASE/api/v1/suppliers/$ID
+curl -s -o /dev/null -w 'admin:   %{http_code}\n' -u admin:$ADMIN_PW -X DELETE $BASE/api/v1/suppliers/$ID</pre></div><p class="see"><b>You should see</b> <code>officer: 403</code> and <code>admin: 404</code>:</p><div class="out">officer: 403
+admin:   404</div></div>
+<div class="tstep"><h4><span class="snum">10</span>The Basic header, built by hand</h4><p><code>-u</code> is just Base64 of <code>user:password</code>. Anyone can decode it, so Basic auth needs HTTPS.</p><div class="code"><pre data-lang="sh">HEADER=$(printf 'officer:%s' "$OFFICER_PW" | base64)
+echo "$HEADER" | base64 -d; echo
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Basic $HEADER" $BASE/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> The decoded <code>officer:…</code> line, then <code>200</code>:</p><div class="out">officer:officer123
+200</div></div>
+<p class="done">✅ <strong>Lesson 1 passes</strong> when every step above matches.</p></section>
+<section id="t-2"><h2 class="s"><span class="n">LESSON 2</span>Users in the database</h2><p><strong>You need:</strong> The Lesson 2 code, and the app running. The first start creates <code>admin</code> from <code>ADMIN_PASSWORD</code>.</p>
+<div class="tstep"><h4><span class="snum">1</span>Run this lesson's unit tests</h4><p>They use the test database, not the running app.</p><div class="code"><pre data-lang="sh">mvn test -Dtest=UserApiTest</pre></div><p class="see"><b>You should see</b> <code>Tests run: 9, Failures: 0</code> and <code>BUILD SUCCESS</code>:</p><div class="out">[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> <code>There are test failures</code>: open <code>target/surefire-reports/</code> for the failing test. <code>No tests were executed</code>: this lesson's test class doesn't exist yet.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>The admin logs in from the database</h4><p>The password is now checked against the <code>app_user</code> table.</p><div class="code"><pre data-lang="sh">curl -s -u admin:$ADMIN_PW $BASE/api/v1/users/me | jq -c '{username, roles, createdBy}'</pre></div><p class="see"><b>You should see</b> <code>admin</code>, all three roles, <code>createdBy: "system"</code>:</p><div class="out">{"username":"admin","roles":["OFFICER","APPROVER","ADMIN"],"createdBy":"system"}</div><p class="iffail"><b>If not:</b> <code>401</code>: the admin was created with an older <code>ADMIN_PASSWORD</code>. It's only read while <code>app_user</code> is empty.</p></div>
+<div class="tstep"><h4><span class="snum">3</span>The admin creates the officer</h4><p>Accounts are created through the API, and the response never contains a password.</p><div class="code"><pre data-lang="sh">curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/users \
+  -d "{\"username\":\"officer\",\"password\":\"$OFFICER_PW\",\"fullName\":\"Neema Said\",\"roles\":[\"OFFICER\"]}" | jq -c '{username, roles, createdBy, password}'</pre></div><p class="see"><b>You should see</b> <code>createdBy: "admin"</code>, and <code>password: null</code>: no password comes back:</p><div class="out">{"username":"officer","roles":["OFFICER"],"createdBy":"admin","password":null}</div><p class="iffail"><b>If not:</b> <code>409</code>: the officer already exists. Carry on, but use the password it was created with.</p></div>
+<div class="tstep"><h4><span class="snum">4</span>…and the approver</h4><div class="code"><pre data-lang="sh">curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/users \
+  -d "{\"username\":\"approver\",\"password\":\"$APPROVER_PW\",\"fullName\":\"Juma Ali\",\"roles\":[\"APPROVER\"]}" | jq -c '{username, roles}'</pre></div><p class="see"><b>You should see</b> The approver account:</p><div class="out">{"username":"approver","roles":["APPROVER"]}</div></div>
+<div class="tstep"><h4><span class="snum">5</span>The officer asks who they are</h4><p><code>/me</code> works for any logged-in user.</p><div class="code"><pre data-lang="sh">curl -s -u officer:$OFFICER_PW $BASE/api/v1/users/me | jq -c '{username, fullName, roles}'</pre></div><p class="see"><b>You should see</b> The officer's account:</p><div class="out">{"username":"officer","fullName":"Neema Said","roles":["OFFICER"]}</div></div>
+<div class="tstep"><h4><span class="snum">6</span>The officer cannot manage users → 403</h4><p>Only the admin may.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/users</pre></div><p class="see"><b>You should see</b> <code>403</code>:</p><div class="out">403</div><p class="iffail"><b>If not:</b> <code>200</code>: the <code>/api/v1/users/**</code> rule is below the general GET rule.</p></div>
+<div class="tstep"><h4><span class="snum">7</span>A new supplier records who created it</h4><p>The client never sends <code>createdBy</code>; Spring fills it in from the login.</p><div class="code"><pre data-lang="sh">TIN=$(printf '%03d-%03d-%03d' $((RANDOM % 1000)) $((RANDOM % 1000)) $((RANDOM % 1000)))
+curl -s -u officer:$OFFICER_PW -X POST -H "$JSON" $BASE/api/v1/suppliers \
+  -d "{\"name\":\"Test Supplier $TIN\",\"tin\":\"$TIN\",\"registrationNumber\":\"TEST-$TIN\",\"category\":\"GOODS\",\"email\":\"test@example.co.tz\"}" \
+  | jq -c '{name, createdBy, updatedBy}'</pre></div><p class="see"><b>You should see</b> <code>createdBy: "officer"</code>:</p><div class="out">{"name":"Test Supplier 080-510-239","createdBy":"officer","updatedBy":"officer"}</div><p class="iffail"><b>If not:</b> <code>createdBy</code> missing: <code>SupplierResponse</code> doesn't return it, or auditing has no <code>auditorAwareRef</code>.</p></div>
+<div class="tstep"><h4><span class="snum">8</span>Passwords are stored as BCrypt hashes</h4><p>Look in the table: no password anywhere.</p><div class="code"><pre data-lang="sh">psql -d $DB -c "SELECT u.username, left(u.password_hash, 22) || '…' AS password_hash, r.role
+  FROM app_user u JOIN app_user_role r ON r.user_id = u.id ORDER BY 1, 3;"</pre></div><p class="see"><b>You should see</b> Every hash starts with <code>{bcrypt}$2a$10$</code>:</p><div class="out"> username |      password_hash      |   role   
+----------+-------------------------+----------
+ admin    | {bcrypt}$2a$10$Z2tefM/… | ADMIN
+ admin    | {bcrypt}$2a$10$Z2tefM/… | APPROVER
+ admin    | {bcrypt}$2a$10$Z2tefM/… | OFFICER
+ approver | {bcrypt}$2a$10$uaIoV5X… | APPROVER
+ officer  | {bcrypt}$2a$10$lS1j9/5… | OFFICER
+(5 rows)</div></div>
+<div class="tstep"><h4><span class="snum">9</span>Disable the officer → 401</h4><p>A disabled account is refused on its next request, and its records keep its name.</p><div class="code"><pre data-lang="sh">OFFICER_ID=$(curl -s -u admin:$ADMIN_PW $BASE/api/v1/users | jq -r '.[] | select(.username=="officer") | .id')
+curl -s -u admin:$ADMIN_PW -X PATCH -H "$JSON" -d '{"enabled":false}' $BASE/api/v1/users/$OFFICER_ID/enabled | jq -c '{username, enabled}'
+curl -s -o /dev/null -w 'officer now: %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> <code>enabled: false</code>, then <code>officer now: 401</code>:</p><div class="out">{"username":"officer","enabled":false}
+officer now: 401</div></div>
+<div class="tstep"><h4><span class="snum">10</span>Enable the officer again</h4><p>Leave the account working for the next lessons.</p><div class="code"><pre data-lang="sh">curl -s -u admin:$ADMIN_PW -X PATCH -H "$JSON" -d '{"enabled":true}' $BASE/api/v1/users/$OFFICER_ID/enabled | jq -c '{username, enabled}'
+curl -s -o /dev/null -w 'officer now: %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> <code>enabled: true</code>, then <code>officer now: 200</code>:</p><div class="out">{"username":"officer","enabled":true}
+officer now: 200</div></div>
+<p class="done">✅ <strong>Lesson 2 passes</strong> when every step above matches.</p></section>
+<section id="t-3"><h2 class="s"><span class="n">LESSON 3</span>Tokens and JWT</h2><p><strong>You need:</strong> The Lesson 3 code, <code>JWT_SECRET</code> in <code>.env</code>, and the officer and approver from Lesson 2.</p>
+<div class="tstep"><h4><span class="snum">1</span>Run this lesson's unit tests</h4><p>They use the test database, not the running app.</p><div class="code"><pre data-lang="sh">mvn test -Dtest=JwtTest</pre></div><p class="see"><b>You should see</b> <code>Tests run: 9, Failures: 0</code> and <code>BUILD SUCCESS</code>:</p><div class="out">[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> <code>There are test failures</code>: open <code>target/surefire-reports/</code> for the failing test. <code>No tests were executed</code>: this lesson's test class doesn't exist yet.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>Log in and keep the token</h4><p>The password is sent once; the token is used from then on.</p><div class="code"><pre data-lang="sh">login() { curl -s -X POST -H "$JSON" -d "{\"username\":\"$1\",\"password\":\"$2\"}" $BASE/api/v1/auth/login; }
+LOGIN=$(login officer $OFFICER_PW)
+echo "$LOGIN" | jq -c '{tokenType, expiresIn}'
+TOKEN=$(echo "$LOGIN" | jq -r .accessToken)</pre></div><p class="see"><b>You should see</b> <code>tokenType: "Bearer"</code> and <code>expiresIn</code>: 1800 in Lesson 3, 300 from Lesson 3B:</p><div class="out">{"tokenType":"Bearer","expiresIn":300}</div><p class="iffail"><b>If not:</b> <code>401 Login failed</code>: wrong password. <code>500</code>: see Lesson 3, common mistakes.</p></div>
+<div class="tstep"><h4><span class="snum">3</span>Read the token: anyone can</h4><p>A JWT is signed, not encrypted. Never put secrets in it.</p><div class="code"><pre data-lang="sh">echo "$TOKEN" | jq -R 'split(".") | .[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | .exp |= todate | {sub, roles, iss, exp}' -c</pre></div><p class="see"><b>You should see</b> <code>sub: "officer"</code>, <code>roles: ["OFFICER"]</code>, and an expiry time:</p><div class="out">{"sub":"officer","roles":["OFFICER"],"iss":"pis","exp":"2026-09-30T11:58:32Z"}</div></div>
+<div class="tstep"><h4><span class="snum">4</span>The token opens the API</h4><p>No password on this request.</p><div class="code"><pre data-lang="sh">curl -s -H "Authorization: Bearer $TOKEN" $BASE/api/v1/users/me | jq -c '{username, roles}'</pre></div><p class="see"><b>You should see</b> The officer:</p><div class="out">{"username":"officer","roles":["OFFICER"]}</div><p class="iffail"><b>If not:</b> <code>401</code>: the token expired. Log in again.</p></div>
+<div class="tstep"><h4><span class="snum">5</span>Roles inside the token are enforced → 403</h4><p>The role comes from the token's <code>roles</code> claim.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" -X POST $BASE/api/v1/requisitions/$ID/approve</pre></div><p class="see"><b>You should see</b> <code>403</code>:</p><div class="out">403</div></div>
+<div class="tstep"><h4><span class="snum">6</span>A bad token → 401, with a Bearer challenge</h4><p>The client learns its token is the problem.</p><div class="code"><pre data-lang="sh">curl -s -i -H "Authorization: Bearer not.a.token" $BASE/api/v1/suppliers | grep -E '^HTTP|^WWW-Authenticate'</pre></div><p class="see"><b>You should see</b> <code>401</code> and <code>WWW-Authenticate: Bearer error="invalid_token"</code>:</p><div class="out">HTTP/1.1 401 
+WWW-Authenticate: Bearer error="invalid_token"</div></div>
+<div class="tstep"><h4><span class="snum">7</span>Forge a token: officer → ADMIN → 401</h4><p>Change one word in the payload, and the signature no longer matches.</p><div class="code"><pre data-lang="sh">b64url_decode() { local s; s=$(printf '%s' "$1" | tr '_-' '/+'); while [ $(( ${#s} % 4 )) -ne 0 ]; do s="$s="; done; printf '%s' "$s" | base64 -d; }
+b64url_encode() { base64 | tr '/+' '_-' | tr -d '=\n'; }
+PAYLOAD=$(b64url_decode "$(echo "$TOKEN" | cut -d. -f2)")
+FORGED="$(echo "$TOKEN" | cut -d. -f1).$(printf '%s' "${PAYLOAD/OFFICER/ADMIN}" | b64url_encode).$(echo "$TOKEN" | cut -d. -f3)"
+curl -s -o /dev/null -w 'real token:   %{http_code}\n' -H "Authorization: Bearer $TOKEN"  -X DELETE $BASE/api/v1/suppliers/$ID
+curl -s -o /dev/null -w 'forged token: %{http_code}\n' -H "Authorization: Bearer $FORGED" -X DELETE $BASE/api/v1/suppliers/$ID</pre></div><p class="see"><b>You should see</b> <code>real token: 403</code> and <code>forged token: 401</code>:</p><div class="out">real token:   403
+forged token: 401</div><p class="iffail"><b>If not:</b> <code>404</code> for the forged token would mean the signature isn't checked. It never should be.</p></div>
+<div class="tstep"><h4><span class="snum">8</span>The trade-off: a token outlives a disabled account</h4><p>Nothing looks up the user when a token arrives.</p><div class="code"><pre data-lang="sh">ADMIN_TOKEN=$(login admin $ADMIN_PW | jq -r .accessToken)
+OFFICER_ID=$(curl -s -H "Authorization: Bearer $ADMIN_TOKEN" $BASE/api/v1/users | jq -r '.[] | select(.username=="officer") | .id')
+curl -s -o /dev/null -H "Authorization: Bearer $ADMIN_TOKEN" -X PATCH -H "$JSON" -d '{"enabled":false}' $BASE/api/v1/users/$OFFICER_ID/enabled
+curl -s -o /dev/null -w 'new login: %{http_code}\n' -X POST -H "$JSON" -d "{\"username\":\"officer\",\"password\":\"$OFFICER_PW\"}" $BASE/api/v1/auth/login
+curl -s -o /dev/null -w 'old token: %{http_code}\n' -H "Authorization: Bearer $TOKEN" $BASE/api/v1/suppliers
+curl -s -o /dev/null -H "Authorization: Bearer $ADMIN_TOKEN" -X PATCH -H "$JSON" -d '{"enabled":true}' $BASE/api/v1/users/$OFFICER_ID/enabled</pre></div><p class="see"><b>You should see</b> <code>new login: 401</code> but <code>old token: 200</code>. The last line enables the officer again.:</p><div class="out">new login: 401
+old token: 200</div></div>
+<p class="done">✅ <strong>Lesson 3 passes</strong> when every step above matches.</p></section>
+<section id="t-3b"><h2 class="s"><span class="n">LESSON 3B</span>Refresh tokens</h2><p><strong>You need:</strong> The Lesson 3B code and the officer from Lesson 2.</p>
+<div class="tstep"><h4><span class="snum">1</span>Run this lesson's unit tests</h4><p>They use the test database, not the running app.</p><div class="code"><pre data-lang="sh">mvn test -Dtest=RefreshTokenTest</pre></div><p class="see"><b>You should see</b> <code>Tests run: 9, Failures: 0</code> and <code>BUILD SUCCESS</code>:</p><div class="out">[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> <code>There are test failures</code>: open <code>target/surefire-reports/</code> for the failing test. <code>No tests were executed</code>: this lesson's test class doesn't exist yet.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>Log in: two tokens</h4><p>A short access token, and a long refresh token.</p><div class="code"><pre data-lang="sh">login() { curl -s -X POST -H "$JSON" -d "{\"username\":\"$1\",\"password\":\"$2\"}" $BASE/api/v1/auth/login; }
+LOGIN=$(login officer $OFFICER_PW)
+echo "$LOGIN" | jq -c '{expiresIn, refreshToken}'
+R1=$(echo "$LOGIN" | jq -r .refreshToken)</pre></div><p class="see"><b>You should see</b> <code>expiresIn: 300</code> and a 43-character refresh token:</p><div class="out">{"expiresIn":300,"refreshToken":"V0yA_zu-_o8xkRoDiyP5FWhhrImLR1Wq8RSPYapYpiI"}</div><p class="iffail"><b>If not:</b> <code>expiresIn: 1800</code>: <code>application.yml</code> still says <code>expiry: 30m</code>.</p></div>
+<div class="tstep"><h4><span class="snum">3</span>Refresh: a new pair, and a different refresh token</h4><p>Rotation: every refresh token works once.</p><div class="code"><pre data-lang="sh">PAIR=$(curl -s -X POST -H "$JSON" -d "{\"refreshToken\":\"$R1\"}" $BASE/api/v1/auth/refresh)
+R2=$(echo "$PAIR" | jq -r .refreshToken)
+echo "R1=$R1"; echo "R2=$R2"
+curl -s -o /dev/null -w 'new access token: %{http_code}\n' -H "Authorization: Bearer $(echo "$PAIR" | jq -r .accessToken)" $BASE/api/v1/users/me</pre></div><p class="see"><b>You should see</b> Two different values, and <code>new access token: 200</code>:</p><div class="out">R1=V0yA_zu-_o8xkRoDiyP5FWhhrImLR1Wq8RSPYapYpiI
+R2=1SyQF-_FLT0SwqM7U39dGbbidZmWL9rsP8zTMaxHt5c
+new access token: 200</div><p class="iffail"><b>If not:</b> <code>401</code>: the client also sent an old <code>Authorization: Bearer</code> header. Send none to <code>/auth/refresh</code>.</p></div>
+<div class="tstep"><h4><span class="snum">4</span>Replay the old one: the whole family is revoked</h4><p>Two holders of R1 means one is a thief, so both are logged out.</p><div class="code"><pre data-lang="sh">curl -s -X POST -H "$JSON" -d "{\"refreshToken\":\"$R1\"}" $BASE/api/v1/auth/refresh | jq -c '{status, title}'
+curl -s -o /dev/null -w 'R2 now: %{http_code}\n' -X POST -H "$JSON" -d "{\"refreshToken\":\"$R2\"}" $BASE/api/v1/auth/refresh</pre></div><p class="see"><b>You should see</b> <code>401 Invalid refresh token</code>, then <code>R2 now: 401</code>:</p><div class="out">{"status":401,"title":"Invalid refresh token"}
+R2 now: 401</div><p class="iffail"><b>If not:</b> <code>R2 now: 200</code>: <code>noRollbackFor</code> is missing on <code>refresh</code>. The unit tests can't catch this one.</p></div>
+<div class="tstep"><h4><span class="snum">5</span>Log out</h4><p>Logout revokes the refresh token and its family.</p><div class="code"><pre data-lang="sh">R3=$(login officer $OFFICER_PW | jq -r .refreshToken)
+curl -s -o /dev/null -w 'logout:  %{http_code}\n' -X POST -H "$JSON" -d "{\"refreshToken\":\"$R3\"}" $BASE/api/v1/auth/logout
+curl -s -o /dev/null -w 'refresh: %{http_code}\n' -X POST -H "$JSON" -d "{\"refreshToken\":\"$R3\"}" $BASE/api/v1/auth/refresh</pre></div><p class="see"><b>You should see</b> <code>logout: 204</code> and <code>refresh: 401</code>:</p><div class="out">logout:  204
+refresh: 401</div></div>
+<div class="tstep"><h4><span class="snum">6</span>Look at the table: hashes only</h4><p>A leaked backup gives out no working tokens.</p><div class="code"><pre data-lang="sh">psql -d $DB -c "SELECT left(token_hash, 12) || '…' AS token_hash, used_at IS NOT NULL AS used,
+  revoked_at IS NOT NULL AS revoked FROM refresh_token ORDER BY created_at DESC LIMIT 4;"</pre></div><p class="see"><b>You should see</b> 64-character hex hashes, with the <code>used</code> and <code>revoked</code> flags from the steps above:</p><div class="out">  token_hash   | used | revoked 
+---------------+------+---------
+ b7741ff14ff0… | f    | t
+ ee2de70e222e… | f    | t
+ 778304c6d078… | t    | t
+ 25ae91800dee… | f    | f
+(4 rows)</div></div>
+<p class="done">✅ <strong>Lesson 3B passes</strong> when every step above matches.</p></section>
+<section id="t-3c"><h2 class="s"><span class="n">LESSON 3C</span>Permissions and method security</h2><p><strong>You need:</strong> The Lesson 3C code, and the officer and approver from Lesson 2.</p>
+<div class="tstep"><h4><span class="snum">1</span>Run this lesson's unit tests</h4><p>They use the test database, not the running app.</p><div class="code"><pre data-lang="sh">mvn test -Dtest=PermissionTest</pre></div><p class="see"><b>You should see</b> <code>Tests run: 8, Failures: 0</code> and <code>BUILD SUCCESS</code>:</p><div class="out">[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> <code>There are test failures</code>: open <code>target/surefire-reports/</code> for the failing test. <code>No tests were executed</code>: this lesson's test class doesn't exist yet.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>Three tokens</h4><div class="code"><pre data-lang="sh">login() { curl -s -X POST -H "$JSON" -d "{\"username\":\"$1\",\"password\":\"$2\"}" $BASE/api/v1/auth/login; }
+ADMIN=$(login admin $ADMIN_PW | jq -r .accessToken)
+OFFICER=$(login officer $OFFICER_PW | jq -r .accessToken)
+APPROVER=$(login approver $APPROVER_PW | jq -r .accessToken)
+REQ='{"department":"ICT","requestedBy":"Neema Said","justification":"Laptops","requiredByDate":"2030-12-31","items":[{"description":"Laptop","quantity":1,"unit":"PIECE","estimatedUnitPrice":2500000.00}]}'
+echo "${#ADMIN} ${#OFFICER} ${#APPROVER}"</pre></div><p class="see"><b>You should see</b> Three lengths, none of them 4 (4 means <code>null</code>: a login failed):</p><div class="out">512 395 351</div></div>
+<div class="tstep"><h4><span class="snum">3</span>What may the approver do?</h4><p>Roles are now bundles of permissions.</p><div class="code"><pre data-lang="sh">curl -s -H "Authorization: Bearer $APPROVER" $BASE/api/v1/users/me | jq -c '{roles, permissions}'</pre></div><p class="see"><b>You should see</b> <code>requisition:approve</code>, <code>supplier:approve</code> and the <code>…:read</code> permissions; nothing ending <code>:write</code>:</p><div class="out">{"roles":["APPROVER"],"permissions":["invoice:read","purchase-order:read","requisition:approve","requisition:read","supplier:approve","supplier:read"]}</div><p class="iffail"><b>If not:</b> No <code>permissions</code> field: <code>UserResponse</code> wasn't updated.</p></div>
+<div class="tstep"><h4><span class="snum">4</span>The token carries the permissions too</h4><p>So token requests are judged the same way as Basic ones.</p><div class="code"><pre data-lang="sh">echo "$APPROVER" | jq -R 'split(".") | .[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | .permissions' -c</pre></div><p class="see"><b>You should see</b> The same list as <code>/me</code>:</p><div class="out">["invoice:read","purchase-order:read","requisition:approve","requisition:read","supplier:approve","supplier:read"]</div></div>
+<div class="tstep"><h4><span class="snum">5</span>The approver cannot raise a requisition → 403</h4><p>No <code>requisition:write</code>.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -X POST -H "$JSON" -H "Authorization: Bearer $APPROVER" -d "$REQ" $BASE/api/v1/requisitions</pre></div><p class="see"><b>You should see</b> <code>403</code>:</p><div class="out">403</div></div>
+<div class="tstep"><h4><span class="snum">6</span>The officer raises and submits one</h4><p>The response now shows who raised it.</p><div class="code"><pre data-lang="sh">R_OFF=$(curl -s -X POST -H "$JSON" -H "Authorization: Bearer $OFFICER" -d "$REQ" $BASE/api/v1/requisitions | jq -r .id)
+curl -s -X POST -H "Authorization: Bearer $OFFICER" $BASE/api/v1/requisitions/$R_OFF/submit | jq -c '{status, createdBy}'</pre></div><p class="see"><b>You should see</b> <code>SUBMITTED</code>, <code>createdBy: "officer"</code>:</p><div class="out">{"status":"SUBMITTED","createdBy":"officer"}</div></div>
+<div class="tstep"><h4><span class="snum">7</span>The officer cannot approve it; the approver can</h4><p>The URL rule checks <code>requisition:approve</code>.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w 'officer:  %{http_code}\n' -X POST -H "Authorization: Bearer $OFFICER" $BASE/api/v1/requisitions/$R_OFF/approve
+curl -s -X POST -H "Authorization: Bearer $APPROVER" $BASE/api/v1/requisitions/$R_OFF/approve | jq -c '{status}'</pre></div><p class="see"><b>You should see</b> <code>officer: 403</code>, then <code>APPROVED</code>:</p><div class="out">officer:  403
+{"status":"APPROVED"}</div></div>
+<div class="tstep"><h4><span class="snum">8</span>Nobody approves their own, not even the admin</h4><p>The method rule reads <code>created_by</code>. The admin holds every permission, and is still refused.</p><div class="code"><pre data-lang="sh">R_ADM=$(curl -s -X POST -H "$JSON" -H "Authorization: Bearer $ADMIN" -d "$REQ" $BASE/api/v1/requisitions | jq -r .id)
+curl -s -o /dev/null -X POST -H "Authorization: Bearer $ADMIN" $BASE/api/v1/requisitions/$R_ADM/submit
+curl -s -X POST -H "Authorization: Bearer $ADMIN" $BASE/api/v1/requisitions/$R_ADM/approve | jq -c '{status, title, detail}'</pre></div><p class="see"><b>You should see</b> <code>403</code>, "Access denied":</p><div class="out">{"status":403,"title":"Access denied","detail":"You may not perform this operation on this record"}</div><p class="iffail"><b>If not:</b> <code>500</code>: no <code>AccessDeniedException</code> handler. <code>200</code>: <code>@EnableMethodSecurity</code> is missing.</p></div>
+<div class="tstep"><h4><span class="snum">9</span>Someone else may approve the admin's</h4><p>Separation of duties, not a ban.</p><div class="code"><pre data-lang="sh">curl -s -X POST -H "Authorization: Bearer $APPROVER" $BASE/api/v1/requisitions/$R_ADM/approve | jq -c '{status, createdBy}'</pre></div><p class="see"><b>You should see</b> <code>APPROVED</code>, <code>createdBy: "admin"</code>:</p><div class="out">{"status":"APPROVED","createdBy":"admin"}</div></div>
+<p class="done">✅ <strong>Lesson 3C passes</strong> when every step above matches.</p></section>
+<section id="t-4"><h2 class="s"><span class="n">LECTURE 4</span>OAuth2 with Spring Authorization Server</h2><p><strong>You need:</strong> Both apps of <code>pis-lecture4-authorization-server/</code> running: <code>auth-server</code> first, then <code>pis-api</code>. Set these variables too:</p>
+<div class="code"><pre data-lang="sh">AUTH=http://localhost:9100          # auth-server
+API=http://localhost:8181           # pis-api
+ID=99999999-9999-9999-9999-999999999999</pre></div>
+<div class="tstep"><h4><span class="snum">1</span>Run the unit tests of both apps</h4><p>They need no running apps: each server is tested on its own.</p><div class="code"><pre data-lang="sh">cd pis-lecture4-authorization-server/auth-server &amp;&amp; mvn test
+cd ../pis-api &amp;&amp; mvn test</pre></div><p class="see"><b>You should see</b> 8 tests in <code>auth-server</code> and 15 in <code>pis-api</code>, <code>BUILD SUCCESS</code> for both:</p><div class="out">auth-server:
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+pis-api:
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS</div><p class="iffail"><b>If not:</b> Only the steps below prove the two apps work <strong>together</strong>.</p></div>
+<div class="tstep"><h4><span class="snum">2</span>The discovery document</h4><p>Where a client finds every other endpoint. <code>pis-api</code> reads it at startup.</p><div class="code"><pre data-lang="sh">curl -s $AUTH/.well-known/openid-configuration | jq -c '{issuer, token_endpoint, jwks_uri}'</pre></div><p class="see"><b>You should see</b> <code>issuer: "http://localhost:9100"</code> and the endpoints:</p><div class="out">{"issuer":"http://localhost:9100","token_endpoint":"http://localhost:9100/oauth2/token","jwks_uri":"http://localhost:9100/oauth2/jwks"}</div><p class="iffail"><b>If not:</b> Connection refused: start <code>auth-server</code>.</p></div>
+<div class="tstep"><h4><span class="snum">3</span>The public key, and never the private one</h4><p>RS256: anyone may check a signature; only the auth server can make one.</p><div class="code"><pre data-lang="sh">curl -s $AUTH/oauth2/jwks | jq -c '.keys[0] | {kty, kid, has_private_part: has("d")}'</pre></div><p class="see"><b>You should see</b> <code>kty: "RSA"</code>, a <code>kid</code>, <code>has_private_part: false</code>:</p><div class="out">{"kty":"RSA","kid":"f6e3b14f-be86-4e4c-8402-e7c46a8673a2","has_private_part":false}</div></div>
+<div class="tstep"><h4><span class="snum">4</span>Client credentials: the reporting job</h4><p>A machine, no person: a scope and no roles.</p><div class="code"><pre data-lang="sh">RT=$(curl -s -u pis-reporting:reporting-secret-123 -d grant_type=client_credentials -d scope=suppliers.read $AUTH/oauth2/token | jq -r .access_token)
+echo "$RT" | jq -R 'split(".") | .[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | {sub, scope, roles}' -c</pre></div><p class="see"><b>You should see</b> <code>sub: "pis-reporting"</code>, <code>scope: ["suppliers.read"]</code>, <code>roles: null</code>:</p><div class="out">{"sub":"pis-reporting","scope":["suppliers.read"],"roles":null}</div><p class="iffail"><b>If not:</b> <code>401 invalid_client</code>: the secret doesn't match <code>PIS_REPORTING_SECRET</code>.</p></div>
+<div class="tstep"><h4><span class="snum">5</span>The job may read suppliers, and nothing else</h4><p>Scopes, checked by the resource server.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w 'suppliers:    %{http_code}\n' -H "Authorization: Bearer $RT" $API/api/v1/suppliers
+curl -s -o /dev/null -w 'requisitions: %{http_code}\n' -H "Authorization: Bearer $RT" $API/api/v1/requisitions</pre></div><p class="see"><b>You should see</b> <code>suppliers: 200</code>, <code>requisitions: 403</code>:</p><div class="out">suppliers:    200
+requisitions: 403</div><p class="iffail"><b>If not:</b> Every call 401: <code>pis-api</code>'s <code>issuer-uri</code> doesn't match exactly, e.g. <code>127.0.0.1</code> vs <code>localhost</code>.</p></div>
+<div class="tstep"><h4><span class="snum">6</span>Log in as a person, in a browser (PKCE)</h4><p>Make the PKCE pair, open the printed URL, log in as <code>officer</code> / <code>officer123</code>. The browser then fails to load <code>127.0.0.1:3000/callback?code=…</code>; nothing runs on port 3000, and that's fine: <strong>copy the <code>code</code> value from the address bar.</strong></p><div class="code"><pre data-lang="sh">VERIFIER=$(openssl rand -base64 48 | tr -d '=+/\n' | cut -c1-64)
+CHALLENGE=$(printf '%s' "$VERIFIER" | openssl dgst -sha256 -binary | base64 | tr '/+' '_-' | tr -d '=\n')
+echo "$AUTH/oauth2/authorize?response_type=code&amp;client_id=pis-web&amp;redirect_uri=http://127.0.0.1:3000/callback&amp;scope=openid%20profile%20pis&amp;state=xyz&amp;code_challenge=$CHALLENGE&amp;code_challenge_method=S256"</pre></div><p class="see"><b>You should see</b> A long URL to open in your browser:</p><div class="out">http://localhost:9100/oauth2/authorize?response_type=code&amp;client_id=pis-web&amp;redirect_uri=http://127.0.0.1:3000/callback&amp;scope=openid%20profile%20pis&amp;state=xyz&amp;code_challenge=E2Klxt7wakdB-iyG2jlzfJLgmXXL9j251L62nh5Gryo&amp;code_challenge_method=S256</div></div>
+<div class="tstep"><h4><span class="snum">7</span>Exchange the code for tokens</h4><p>Within 5 minutes of step 5. The <code>code_verifier</code> proves you started the login.</p><div class="code"><pre data-lang="sh">CODE=paste-the-code-here
+TOKENS=$(curl -s -d grant_type=authorization_code -d "code=$CODE" -d redirect_uri=http://127.0.0.1:3000/callback \
+  -d client_id=pis-web -d "code_verifier=$VERIFIER" $AUTH/oauth2/token)
+echo "$TOKENS" | jq -c '{token_type, expires_in, scope, has_id_token: has("id_token"), has_refresh_token: has("refresh_token")}'
+AT=$(echo "$TOKENS" | jq -r .access_token)</pre></div><p class="see"><b>You should see</b> An access token and an ID token, and no refresh token: <code>pis-web</code> is a public client:</p><div class="out">{"token_type":"Bearer","expires_in":299,"scope":"openid profile pis","has_id_token":true,"has_refresh_token":false}</div><p class="iffail"><b>If not:</b> <code>invalid_grant</code>: the code was already used, is older than 5 minutes, or <code>VERIFIER</code> is from a different terminal.</p></div>
+<div class="tstep"><h4><span class="snum">8</span>PIS accepts the auth server's token</h4><p>PIS never saw the password.</p><div class="code"><pre data-lang="sh">curl -s -H "Authorization: Bearer $AT" $API/api/v1/me | jq -c '{subject, client, authorities}'
+curl -s -o /dev/null -w 'approve: %{http_code}\n' -H "Authorization: Bearer $AT" -X POST $API/api/v1/requisitions/$ID/approve</pre></div><p class="see"><b>You should see</b> <code>subject: "officer"</code>, <code>ROLE_OFFICER</code> among the authorities, then <code>approve: 403</code>:</p><div class="out">{"subject":"officer","client":["pis-web"],"authorities":["ROLE_OFFICER","SCOPE_openid","SCOPE_pis","SCOPE_profile"]}
+approve: 403</div></div>
+<div class="tstep"><h4><span class="snum">9</span>Basic auth is gone</h4><p>The only way into <code>pis-api</code> is a token.</p><div class="code"><pre data-lang="sh">curl -s -o /dev/null -w '%{http_code}\n' -u officer:officer123 $API/api/v1/suppliers</pre></div><p class="see"><b>You should see</b> <code>401</code>:</p><div class="out">401</div></div>
+<p class="done">✅ <strong>Lecture 4 passes</strong> when every step above matches.</p></section>
+<section id="t-trouble"><h2 class="s"><span class="n">WHEN A STEP DOESN'T MATCH</span>Five things to check</h2><ol class="steps">
+<li><strong>Read the status code first.</strong> 401: <em>who are you?</em> failed. 403: <em>what may you do?</em> failed. 404 on an approve or delete with the fake <code>$ID</code> is a <strong>success</strong>: security let it through.</li>
+<li><strong>Check the variables:</strong> <code>echo "$BASE $OFFICER_PW"</code>. A new terminal has none of them.</li>
+<li><strong>Tokens expire.</strong> From Lesson 3B an access token lasts 5 minutes. If a token step suddenly returns 401, run that lesson's login step again.</li>
+<li><strong>Read the app's log</strong> in the terminal running <code>mvn spring-boot:run</code>.</li>
+<li><strong>Compare with the demo.</strong> <code>pis-security-demo/</code> on port 8099 has every lesson finished. If a step passes there with <code>BASE=http://localhost:8099</code>, the difference is in your code.</li>
+</ol></section>
+<nav class="pager" aria-label="Lesson navigation"><a href="#overview" class="prev"><span>Back to</span>Course overview</a><a href="#l1" class="next"><span>Start with</span>1 · HTTP Basic and roles</a></nav></article>
+
+<footer>PIS Security Course · Lessons 1–3C in the PIS project, Lecture 4 in <code>pis-lecture4-authorization-server/</code>. Markdown versions live next to the code.</footer>
 </main>
 </div>
 
@@ -3599,7 +4864,14 @@ PASS  401  officer token edited to ADMIN</div>
   function update(){
     ticking = false;
     var line = 110, activeGroup = 0, activeLink = -1;
-    lessons.forEach(function(el, i){ if(el && el.getBoundingClientRect().top <= line) activeGroup = i; });
+    // The section that has scrolled past the line and is closest to it, whatever
+    // its position in the sidebar (the Testing guide is listed early but sits last).
+    var best = -Infinity;
+    lessons.forEach(function(el, i){
+      if(!el) return;
+      var top = el.getBoundingClientRect().top;
+      if(top <= line && top > best){ best = top; activeGroup = i; }
+    });
     targets.forEach(function(el, i){
       if(el && el.getBoundingClientRect().top <= line && groups[activeGroup].contains(subLinks[i])) activeLink = i;
     });

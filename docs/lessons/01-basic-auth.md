@@ -101,6 +101,30 @@ purchase should not be the one who *approves* it. Our roles mirror that.
 | `approver` | APPROVER | Approves or rejects requisitions, changes supplier status |
 | `admin` | ADMIN, APPROVER, OFFICER | Everything, including deletes |
 
+### This is RBAC: role-based access control
+
+What you're building in this lesson has a name: **role-based access control**,
+or **RBAC**. Every rule names a **role**, and a person is allowed in if they hold it:
+
+```java
+.requestMatchers(HttpMethod.POST, "/api/v1/requisitions/*/approve").hasRole("APPROVER")
+```
+
+RBAC is the right starting point: it's simple, and it matches how an
+organisation thinks ("approvers approve"). It has two limits, and later lessons
+fix each one:
+
+| Limit | Example in PIS | Fixed in |
+| --- | --- | --- |
+| The rule names a **job title**, not an **action** | Adding a read-only auditor means checking every rule by hand | **Lesson 3C**: permissions (`hasAuthority("requisition:approve")`), with roles as bundles of permissions |
+| The rule can't look at the **record** | An approver who raised a requisition could approve it themselves | **Lesson 3C**: `@PreAuthorize` with a rule that checks `created_by` (from Lesson 2) |
+
+| Term | Question it answers | Spring |
+| --- | --- | --- |
+| Role-based (RBAC) | Is this person an APPROVER? | `hasRole("APPROVER")` |
+| Permission-based | May this person approve requisitions? | `hasAuthority("requisition:approve")` |
+| Attribute-based (ABAC) | May this person approve **this** requisition? | `@PreAuthorize("… @requisitionGuard.raisedBy(#id, authentication.name)")` |
+
 ---
 
 ## Request flow

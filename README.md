@@ -1,5 +1,31 @@
 # Procurement Information System
 
+A Spring Boot API for suppliers, requisitions, purchase orders and invoices, and
+the codebase for the **PIS Security Course**.
+
+## PIS Security Course
+
+Step by step, from a wide-open API to signed tokens and permissions. Each lesson
+upgrades this project, and each one ends with tests you can run.
+
+| # | Lesson | What you add |
+| --- | --- | --- |
+| 1 | [HTTP Basic and roles](docs/lessons/01-basic-auth.md) | Log in, role rules, 401 vs 403 |
+| 2 | [Users in the database](docs/lessons/02-users-in-database.md) | `app_user` table, first admin, who created what |
+| 3 | [Tokens and JWT](docs/lessons/03-jwt.md) | Log in once, then `Bearer` tokens |
+| 3B | [Refresh tokens](docs/lessons/03b-refresh-tokens.md) | 5-minute tokens, rotation, logout |
+| 3C | [Permissions and method security](docs/lessons/03c-permissions.md) | `hasAuthority`, `@PreAuthorize`, nobody approves their own requisition |
+
+- **[Testing guide](docs/lessons/TESTING.md):** test each lesson step by step: the command, what you should see, and what to check if it doesn't match.
+- **[Course index](docs/lessons/README.md):** the full course map, including the OAuth2 lectures.
+- **[Course web page](docs/lessons/index.html):** the whole course as one page, with a sidebar and a setup box. Download it and open it in a browser.
+
+This branch contains **Lesson 1** in the code; the lessons show how to add the rest.
+
+---
+
+## The project
+
 Spring Boot CRUD skeleton — model, repository, service, DTO, controller.
 
 **Spring Boot 3.5.6 · Java 17 · PostgreSQL 17 · Flyway**
