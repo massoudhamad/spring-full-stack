@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
 import tz.co.hmy.pis.security.Authorities;
 
@@ -50,11 +49,12 @@ class JwtTest {
     @Autowired AppUserRepository users;
     @Autowired PasswordEncoder encoder;
     @Autowired JwtEncoder jwtEncoder;
+    @Autowired Authorities authorities;
 
     @BeforeEach
     void createUsers() {
-        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
-        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of(Role.APPROVER)));
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of("OFFICER")));
+        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of("APPROVER")));
     }
 
     /** POST /api/v1/auth/login and return just the token. */
@@ -198,10 +198,10 @@ class JwtTest {
     @Test
     void jwt_post_processor_tests_rules_without_logging_in() throws Exception {
         mvc.perform(delete("/api/v1/suppliers/{id}", UNKNOWN_ID)
-                .with(jwt().authorities(Authorities.of(Set.of(Role.OFFICER)))))
+                .with(jwt().authorities(authorities.of(Set.of("OFFICER")))))
             .andExpect(status().isForbidden());
         mvc.perform(delete("/api/v1/suppliers/{id}", UNKNOWN_ID)
-                .with(jwt().authorities(Authorities.of(Set.of(Role.ADMIN)))))
+                .with(jwt().authorities(authorities.of(Set.of("ADMIN")))))
             .andExpect(status().isNotFound());
     }
 }

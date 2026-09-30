@@ -41,6 +41,7 @@ public class TokenService {
     private final JwtProperties properties;
     private final AppUserRepository users;
     private final RefreshTokenRepository refreshTokens;
+    private final Authorities authorities;
 
     @Transactional
     public TokenResponse login(String username, String password) {
@@ -98,7 +99,7 @@ public class TokenService {
 
         // Roles are read from the database on every login AND every refresh,
         // so a role change reaches the user within one access-token lifetime.
-        List<String> roles = user.getRoles().stream().map(Enum::name).sorted().toList();
+        List<String> roles = user.getRoles().stream().sorted().toList();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("pis")
@@ -106,7 +107,7 @@ public class TokenService {
                 .issuedAt(now)
                 .expiresAt(now.plus(properties.expiry()))
                 .claim("roles", roles)
-                .claim("permissions", Authorities.permissions(user.getRoles()))   // what the user may DO
+                .claim("permissions", authorities.permissions(user.getRoles()))   // what the user may DO
                 .build();
 
         // Without an explicit header Spring would pick RS256, which needs a private key we don't have.

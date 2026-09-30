@@ -37,13 +37,13 @@ public class AppUser extends Auditable {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    /** Role names, e.g. "OFFICER". Each must exist in the role table (a foreign key checks it). */
     @ElementCollection
     @CollectionTable(name = "app_user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
-    private Set<Role> roles = new HashSet<>();
+    private Set<String> roles = new HashSet<>();
 
-    public AppUser(String username, String passwordHash, String fullName, Set<Role> roles) {
+    public AppUser(String username, String passwordHash, String fullName, Set<String> roles) {
         this.username = username.toLowerCase();
         this.passwordHash = passwordHash;
         this.fullName = fullName;

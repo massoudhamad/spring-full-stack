@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
 
 import java.util.Set;
@@ -40,7 +39,7 @@ public class AdminAccountInitializer implements ApplicationRunner {
             return;
         }
         users.save(new AppUser("admin", passwordEncoder.encode(adminPassword), "System Administrator",
-                Set.of(Role.ADMIN, Role.APPROVER, Role.OFFICER)));
+                Set.of("ADMIN", "APPROVER", "OFFICER")));
         log.warn("No users found. Created the initial 'admin' account from ADMIN_PASSWORD.");
     }
 }

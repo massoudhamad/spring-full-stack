@@ -15,11 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
 import tz.co.hmy.pis.model.Permission;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
+import tz.co.hmy.pis.security.Authorities;
 import tz.co.hmy.pis.service.RequisitionService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
@@ -52,11 +53,12 @@ class PermissionTest {
     @Autowired AppUserRepository users;
     @Autowired PasswordEncoder encoder;
     @Autowired RequisitionService requisitions;
+    @Autowired Authorities authorities;
 
     @BeforeEach
     void createUsers() {
-        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
-        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of(Role.APPROVER)));
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of("OFFICER")));
+        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of("APPROVER")));
     }
 
     /** Creates and submits a requisition as the given user; returns its id. */
@@ -76,13 +78,14 @@ class PermissionTest {
 
     @Test
     void roles_are_bundles_of_permissions() {
-        assertThat(Role.APPROVER.permissions())
-            .contains(Permission.REQUISITION_APPROVE, Permission.SUPPLIER_APPROVE)
-            .doesNotContain(Permission.REQUISITION_WRITE, Permission.SUPPLIER_WRITE, Permission.RECORD_DELETE);
-        assertThat(Role.OFFICER.permissions())
-            .contains(Permission.REQUISITION_WRITE)
-            .doesNotContain(Permission.REQUISITION_APPROVE);
-        assertThat(Role.ADMIN.permissions()).containsExactlyInAnyOrder(Permission.values());
+        assertThat(authorities.permissions(Set.of("APPROVER")))
+            .contains("requisition:approve", "supplier:approve")
+            .doesNotContain("requisition:write", "supplier:write", "record:delete");
+        assertThat(authorities.permissions(Set.of("OFFICER")))
+            .contains("requisition:write")
+            .doesNotContain("requisition:approve");
+        assertThat(authorities.permissions(Set.of("ADMIN")))
+            .containsExactlyInAnyOrder(Arrays.stream(Permission.values()).map(Permission::authority).toArray(String[]::new));
     }
 
     @Test
@@ -162,7 +165,7 @@ class PermissionTest {
 
     /** No HTTP at all: the rule is on the service, so a batch job or another service hits it too. */
     @Test
-    @WithRole(Role.OFFICER)
+    @WithRole("OFFICER")
     void the_service_itself_refuses_without_the_permission() {
         assertThatThrownBy(() -> requisitions.approve(UUID.randomUUID()))
             .isInstanceOf(AccessDeniedException.class);

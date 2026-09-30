@@ -13,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
 
 import java.nio.charset.StandardCharsets;
@@ -34,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Two tools, two purposes:
  *   httpBasic("user", "pass")  sends a real Authorization header, so the
  *                              password check itself is tested.
- *   @WithRole(Role.X)          skips the password check and tests only
+ *   @WithRole("X")          skips the password check and tests only
  *                              the authorization rules (Lesson 3C).
  */
 @SpringBootTest
@@ -51,8 +50,8 @@ class SecurityTest {
 
     @BeforeEach
     void createUsers() {
-        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
-        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of(Role.APPROVER)));
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of("OFFICER")));
+        users.save(new AppUser("approver", encoder.encode("approver-pass"), "Test Approver", Set.of("APPROVER")));
     }
 
     @Nested
@@ -112,7 +111,7 @@ class SecurityTest {
     class Authorization {
 
         @Test
-        @WithRole(Role.OFFICER)
+        @WithRole("OFFICER")
         void officer_cannot_approve_a_requisition() throws Exception {
             mvc.perform(post("/api/v1/requisitions/{id}/approve", UNKNOWN_ID))
                 .andExpect(status().isForbidden())
@@ -120,14 +119,14 @@ class SecurityTest {
         }
 
         @Test
-        @WithRole(Role.APPROVER)
+        @WithRole("APPROVER")
         void approver_can_approve_a_requisition() throws Exception {
             mvc.perform(post("/api/v1/requisitions/{id}/approve", UNKNOWN_ID))
                 .andExpect(status().isNotFound());
         }
 
         @Test
-        @WithRole(Role.APPROVER)
+        @WithRole("APPROVER")
         void approver_cannot_create_a_supplier() throws Exception {
             mvc.perform(post("/api/v1/suppliers")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -136,7 +135,7 @@ class SecurityTest {
         }
 
         @Test
-        @WithRole(Role.OFFICER)
+        @WithRole("OFFICER")
         void officer_cannot_delete() throws Exception {
             mvc.perform(delete("/api/v1/suppliers/{id}", UNKNOWN_ID))
                 .andExpect(status().isForbidden());
@@ -150,7 +149,7 @@ class SecurityTest {
         }
 
         @Test
-        @WithRole(Role.APPROVER)
+        @WithRole("APPROVER")
         void any_authenticated_user_can_read() throws Exception {
             mvc.perform(get("/api/v1/requisitions")).andExpect(status().isOk());
         }

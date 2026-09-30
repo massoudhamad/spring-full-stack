@@ -59,8 +59,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
 
                         // From here on, every rule names a PERMISSION, never a role.
-                        // Which roles hold which permission is decided once, in Role.
+                        // Which roles hold which permission is data, in the role_permission table.
                         .requestMatchers("/api/v1/users/**").hasAuthority("user:manage")
+                        .requestMatchers("/api/v1/roles/**", "/api/v1/permissions").hasAuthority("role:manage")
 
                         // Specific actions first: the first match wins.
                         .requestMatchers(HttpMethod.POST, "/api/v1/requisitions/*/approve",

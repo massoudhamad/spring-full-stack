@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
 
 import java.util.Set;
@@ -45,7 +44,7 @@ class UserApiTest {
 
     @BeforeEach
     void createOfficer() {
-        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of("OFFICER")));
     }
 
     @Test

@@ -23,6 +23,7 @@ import tz.co.hmy.pis.security.Authorities;
 public class DatabaseUserDetailsService implements UserDetailsService {
 
     private final AppUserRepository users;
+    private final Authorities authorities;
 
     @Override
     @Transactional(readOnly = true) // roles are lazy; read them while the session is open
@@ -35,7 +36,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
                 .password(user.getPasswordHash())
                 // Not .roles(...): in this builder, roles() and authorities() replace
                 // each other, and whichever is called last wins.
-                .authorities(Authorities.of(user.getRoles()))
+                .authorities(authorities.of(user.getRoles()))   // read from role_permission on every request
                 .disabled(!user.isEnabled())
                 .build();
     }

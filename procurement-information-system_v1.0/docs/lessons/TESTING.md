@@ -17,6 +17,7 @@ on your machine; the status codes and the fields should not.
 | [3 · Tokens and JWT](#lesson-3--tokens-and-jwt) | `JwtTest` (9 tests) | yes | 8 |
 | [3B · Refresh tokens](#lesson-3b--refresh-tokens) | `RefreshTokenTest` (9 tests) | yes | 6 |
 | [3C · Permissions and method security](#lesson-3c--permissions-and-method-security) | `PermissionTest` (8 tests) | yes | 9 |
+| [3D · Roles and permissions in the database](#lesson-3d--roles-and-permissions-in-the-database) | `RoleApiTest` (10 tests) | yes | 9 |
 | [4 · OAuth2 with Spring Authorization Server](#lecture-4--oauth2-with-spring-authorization-server) | both apps (8 + 15 tests) | both apps | 9 |
 
 ## Before you start: set your variables
@@ -123,7 +124,7 @@ curl -s -u officer:$OFFICER_PW "$BASE/api/v1/suppliers?size=1" | jq '{totalEleme
 
 ```
 {
-  "totalElements": 10,
+  "totalElements": 17,
   "first": "Kisiwa ICT Consultants"
 }
 ```
@@ -253,7 +254,7 @@ curl -s -u admin:$ADMIN_PW $BASE/api/v1/users/me | jq -c '{username, roles, crea
 **You should see** `admin`, all three roles, `createdBy: "system"`:
 
 ```
-{"username":"admin","roles":["OFFICER","APPROVER","ADMIN"],"createdBy":"system"}
+{"username":"admin","roles":["ADMIN","APPROVER","OFFICER"],"createdBy":"system"}
 ```
 
 > **If not:** `401`: the admin was created with an older `ADMIN_PASSWORD`. It's only read while `app_user` is empty.
@@ -332,7 +333,7 @@ curl -s -u officer:$OFFICER_PW -X POST -H "$JSON" $BASE/api/v1/suppliers \
 **You should see** `createdBy: "officer"`:
 
 ```
-{"name":"Test Supplier 080-510-239","createdBy":"officer","updatedBy":"officer"}
+{"name":"Test Supplier 071-825-056","createdBy":"officer","updatedBy":"officer"}
 ```
 
 > **If not:** `createdBy` missing: `SupplierResponse` doesn't return it, or auditing has no `auditorAwareRef`.
@@ -354,8 +355,8 @@ psql -d $DB -c "SELECT u.username, left(u.password_hash, 22) || '…' AS passwor
  admin    | {bcrypt}$2a$10$Z2tefM/… | ADMIN
  admin    | {bcrypt}$2a$10$Z2tefM/… | APPROVER
  admin    | {bcrypt}$2a$10$Z2tefM/… | OFFICER
- approver | {bcrypt}$2a$10$uaIoV5X… | APPROVER
- officer  | {bcrypt}$2a$10$lS1j9/5… | OFFICER
+ approver | {bcrypt}$2a$10$zMRa3nf… | APPROVER
+ officer  | {bcrypt}$2a$10$btafbf0… | OFFICER
 (5 rows)
 ```
 
@@ -447,7 +448,7 @@ echo "$TOKEN" | jq -R 'split(".") | .[1] | gsub("-";"+") | gsub("_";"/") | @base
 **You should see** `sub: "officer"`, `roles: ["OFFICER"]`, and an expiry time:
 
 ```
-{"sub":"officer","roles":["OFFICER"],"iss":"pis","exp":"2026-09-30T11:58:32Z"}
+{"sub":"officer","roles":["OFFICER"],"iss":"pis","exp":"2026-09-30T12:33:48Z"}
 ```
 
 ### Step 4 · The token opens the API
@@ -576,7 +577,7 @@ R1=$(echo "$LOGIN" | jq -r .refreshToken)
 **You should see** `expiresIn: 300` and a 43-character refresh token:
 
 ```
-{"expiresIn":300,"refreshToken":"V0yA_zu-_o8xkRoDiyP5FWhhrImLR1Wq8RSPYapYpiI"}
+{"expiresIn":300,"refreshToken":"8L1ykaoWEPtnz6YKbZbu4jXvMfvfcCSOGXbF-6zjSuc"}
 ```
 
 > **If not:** `expiresIn: 1800`: `application.yml` still says `expiry: 30m`.
@@ -595,8 +596,8 @@ curl -s -o /dev/null -w 'new access token: %{http_code}\n' -H "Authorization: Be
 **You should see** Two different values, and `new access token: 200`:
 
 ```
-R1=V0yA_zu-_o8xkRoDiyP5FWhhrImLR1Wq8RSPYapYpiI
-R2=1SyQF-_FLT0SwqM7U39dGbbidZmWL9rsP8zTMaxHt5c
+R1=8L1ykaoWEPtnz6YKbZbu4jXvMfvfcCSOGXbF-6zjSuc
+R2=QBOpn48Yd4CbKyzEgZRNR6KtM9j8bn02hlzWwHVySgc
 new access token: 200
 ```
 
@@ -651,10 +652,10 @@ psql -d $DB -c "SELECT left(token_hash, 12) || '…' AS token_hash, used_at IS N
 ```
   token_hash   | used | revoked 
 ---------------+------+---------
- b7741ff14ff0… | f    | t
- ee2de70e222e… | f    | t
- 778304c6d078… | t    | t
- 25ae91800dee… | f    | f
+ 7ed2feb4f883… | f    | t
+ 4c15fdbebf88… | f    | t
+ 2bfe55eddec0… | t    | t
+ 3224c342c334… | f    | f
 (4 rows)
 ```
 
@@ -697,7 +698,7 @@ echo "${#ADMIN} ${#OFFICER} ${#APPROVER}"
 **You should see** Three lengths, none of them 4 (4 means `null`: a login failed):
 
 ```
-512 395 351
+531 395 351
 ```
 
 ### Step 3 · What may the approver do?
@@ -808,6 +809,192 @@ curl -s -X POST -H "Authorization: Bearer $APPROVER" $BASE/api/v1/requisitions/$
 ```
 
 ✅ **Lesson 3C passes** when every step above matches.
+
+---
+
+## Lesson 3D — Roles and permissions in the database
+
+**You need:** The Lesson 3D code (migration V7 runs on start), and the officer from Lesson 2.
+
+### Step 1 · Run this lesson's unit tests
+
+They use the test database, not the running app.
+
+```bash
+mvn test -Dtest=RoleApiTest
+```
+
+**You should see** `Tests run: 10, Failures: 0` and `BUILD SUCCESS`:
+
+```
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+> **If not:** `There are test failures`: open `target/surefire-reports/` for the failing test. `No tests were executed`: this lesson's test class doesn't exist yet.
+
+### Step 2 · The roles are now rows in the database
+
+The three roles from Lesson 3C, seeded by migration V7 with the same permissions.
+
+```bash
+psql -d $DB -c "SELECT r.name, r.built_in, count(rp.permission) AS permissions
+  FROM role r LEFT JOIN role_permission rp ON rp.role = r.name GROUP BY r.name, r.built_in ORDER BY r.name;"
+```
+
+**You should see** ADMIN with 13 permissions, APPROVER with 6, OFFICER with 8, all built in:
+
+```
+   name   | built_in | permissions 
+----------+----------+-------------
+ ADMIN    | t        |          13
+ APPROVER | t        |           6
+ OFFICER  | t        |           8
+(3 rows)
+```
+
+> **If not:** `relation "role" does not exist`: the app hasn't started since you added V7.
+
+### Step 3 · Every permission the code knows
+
+Permissions stay in code: this list comes from the `Permission` enum.
+
+```bash
+curl -s -u admin:$ADMIN_PW $BASE/api/v1/permissions | jq -c
+```
+
+**You should see** 13 permissions, including the new `role:manage`:
+
+```
+["supplier:read","supplier:write","supplier:approve","requisition:read","requisition:write","requisition:approve","purchase-order:read","purchase-order:write","invoice:read","invoice:write","record:delete","user:manage","role:manage"]
+```
+
+> **If not:** `403`: the admin role lacks `role:manage`. Check that migration V7 ran.
+
+### Step 4 · Create a role while PIS is running
+
+No code change, no restart.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/roles \
+  -d '{"name":"AUDITOR","description":"Internal audit: reads everything",
+       "permissions":["supplier:read","requisition:read","purchase-order:read","invoice:read"]}' \
+  | jq -c '{name, builtIn, permissions, users}'
+```
+
+**You should see** `201`: `builtIn: false`, four read permissions, `users: 0`:
+
+```
+{"name":"AUDITOR","builtIn":false,"permissions":["invoice:read","purchase-order:read","requisition:read","supplier:read"],"users":0}
+```
+
+> **If not:** `409`: AUDITOR already exists. Carry on.
+
+### Step 5 · Give someone the role
+
+The new account gets exactly the role's permissions.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/users \
+  -d '{"username":"auditor","password":"auditor123","fullName":"Zuhura Audit","roles":["AUDITOR"]}' \
+  | jq -c '{username, roles, permissions}'
+```
+
+**You should see** The auditor with `roles: ["AUDITOR"]` and the four permissions:
+
+```
+{"username":"auditor","roles":["AUDITOR"],"permissions":["invoice:read","purchase-order:read","requisition:read","supplier:read"]}
+```
+
+> **If not:** `422 Unknown role: AUDITOR`: step 3 didn't work.
+
+### Step 6 · The auditor can read, and cannot write
+
+```bash
+TIN=$(printf '%03d-%03d-%03d' $((RANDOM % 1000)) $((RANDOM % 1000)) $((RANDOM % 1000)))
+SUPPLIER="{\"name\":\"Audit Test $TIN\",\"tin\":\"$TIN\",\"registrationNumber\":\"AUDIT-$TIN\",\"category\":\"GOODS\",\"email\":\"audit@example.co.tz\"}"
+curl -s -o /dev/null -w 'read:  %{http_code}\n' -u auditor:auditor123 $BASE/api/v1/suppliers
+curl -s -o /dev/null -w 'write: %{http_code}\n' -u auditor:auditor123 -X POST -H "$JSON" -d "$SUPPLIER" $BASE/api/v1/suppliers
+```
+
+**You should see** `read: 200`, `write: 403`:
+
+```
+read:  200
+write: 403
+```
+
+### Step 7 · Change the role while the auditor is logged in
+
+Grant `supplier:write`. A Basic login sees it on its next request. A token issued before the change doesn't, until it's refreshed.
+
+```bash
+LOGIN=$(curl -s -X POST -H "$JSON" -d '{"username":"auditor","password":"auditor123"}' $BASE/api/v1/auth/login)
+OLD_TOKEN=$(echo "$LOGIN" | jq -r .accessToken); REFRESH=$(echo "$LOGIN" | jq -r .refreshToken)
+
+curl -s -u admin:$ADMIN_PW -X PUT -H "$JSON" $BASE/api/v1/roles/AUDITOR/permissions \
+  -d '{"permissions":["supplier:read","supplier:write","requisition:read","purchase-order:read","invoice:read"]}' \
+  | jq -c '{name, permissions, users}'
+
+TIN=$(printf '%03d-%03d-%03d' $((RANDOM % 1000)) $((RANDOM % 1000)) $((RANDOM % 1000)))
+SUPPLIER="{\"name\":\"Audit Test $TIN\",\"tin\":\"$TIN\",\"registrationNumber\":\"AUDIT-$TIN\",\"category\":\"GOODS\",\"email\":\"audit@example.co.tz\"}"
+curl -s -o /dev/null -w 'Basic login:     %{http_code}\n' -u auditor:auditor123 -X POST -H "$JSON" -d "$SUPPLIER" $BASE/api/v1/suppliers
+TIN=$(printf '%03d-%03d-%03d' $((RANDOM % 1000)) $((RANDOM % 1000)) $((RANDOM % 1000)))
+SUPPLIER="{\"name\":\"Audit Test $TIN\",\"tin\":\"$TIN\",\"registrationNumber\":\"AUDIT-$TIN\",\"category\":\"GOODS\",\"email\":\"audit@example.co.tz\"}"
+curl -s -o /dev/null -w 'old token:       %{http_code}\n' -H "Authorization: Bearer $OLD_TOKEN" -X POST -H "$JSON" -d "$SUPPLIER" $BASE/api/v1/suppliers
+NEW_TOKEN=$(curl -s -X POST -H "$JSON" -d "{\"refreshToken\":\"$REFRESH\"}" $BASE/api/v1/auth/refresh | jq -r .accessToken)
+TIN=$(printf '%03d-%03d-%03d' $((RANDOM % 1000)) $((RANDOM % 1000)) $((RANDOM % 1000)))
+SUPPLIER="{\"name\":\"Audit Test $TIN\",\"tin\":\"$TIN\",\"registrationNumber\":\"AUDIT-$TIN\",\"category\":\"GOODS\",\"email\":\"audit@example.co.tz\"}"
+curl -s -o /dev/null -w 'after refresh:   %{http_code}\n' -H "Authorization: Bearer $NEW_TOKEN" -X POST -H "$JSON" -d "$SUPPLIER" $BASE/api/v1/suppliers
+```
+
+**You should see** The role with `supplier:write` and `users: 1`, then `Basic login: 201`, `old token: 403`, `after refresh: 201`:
+
+```
+{"name":"AUDITOR","permissions":["invoice:read","purchase-order:read","requisition:read","supplier:read","supplier:write"],"users":1}
+Basic login:     201
+old token:       403
+after refresh:   201
+```
+
+> **If not:** `old token: 201`: the permissions aren't in the token. Check `TokenService`.
+
+### Step 8 · The guard rails
+
+Three changes PIS refuses, each with a clear error.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X PUT -H "$JSON" -d '{"permissions":["supplier:read"]}' $BASE/api/v1/roles/ADMIN/permissions | jq -c '{status, detail}'
+curl -s -u admin:$ADMIN_PW -X DELETE $BASE/api/v1/roles/AUDITOR | jq -c '{status, detail}'
+curl -s -u admin:$ADMIN_PW -X PUT -H "$JSON" -d '{"permissions":["supplier:fly"]}' $BASE/api/v1/roles/AUDITOR/permissions | jq -c '{status, title}'
+```
+
+**You should see** `422` for ADMIN, `422` for a role in use, `400` for an unknown permission:
+
+```
+{"status":422,"detail":"The ADMIN role always has every permission and can't be changed"}
+{"status":422,"detail":"Role AUDITOR is held by 1 user(s). Take it away from them first."}
+{"status":400,"title":"Malformed request"}
+```
+
+> **If not:** A `500` for the last one: the `HttpMessageNotReadableException` handler is missing.
+
+### Step 9 · Put AUDITOR back to read-only
+
+Leave the role as the lesson found it.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X PUT -H "$JSON" $BASE/api/v1/roles/AUDITOR/permissions \
+  -d '{"permissions":["supplier:read","requisition:read","purchase-order:read","invoice:read"]}' | jq -c '{name, permissions}'
+```
+
+**You should see** The four read permissions again:
+
+```
+{"name":"AUDITOR","permissions":["invoice:read","purchase-order:read","requisition:read","supplier:read"]}
+```
+
+✅ **Lesson 3D passes** when every step above matches.
 
 ---
 
@@ -925,7 +1112,7 @@ echo "$AUTH/oauth2/authorize?response_type=code&client_id=pis-web&redirect_uri=h
 **You should see** A long URL to open in your browser:
 
 ```
-http://localhost:9100/oauth2/authorize?response_type=code&client_id=pis-web&redirect_uri=http://127.0.0.1:3000/callback&scope=openid%20profile%20pis&state=xyz&code_challenge=E2Klxt7wakdB-iyG2jlzfJLgmXXL9j251L62nh5Gryo&code_challenge_method=S256
+http://localhost:9100/oauth2/authorize?response_type=code&client_id=pis-web&redirect_uri=http://127.0.0.1:3000/callback&scope=openid%20profile%20pis&state=xyz&code_challenge=fcYDCgNXKnwhJ6BubIZqS-0JwfjHfnHcum235y9Y8Y0&code_challenge_method=S256
 ```
 
 ### Step 7 · Exchange the code for tokens

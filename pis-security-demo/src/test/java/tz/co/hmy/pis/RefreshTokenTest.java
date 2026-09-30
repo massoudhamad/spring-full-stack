@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import tz.co.hmy.pis.model.AppUser;
 import tz.co.hmy.pis.model.RefreshToken;
-import tz.co.hmy.pis.model.Role;
 import tz.co.hmy.pis.repository.AppUserRepository;
 import tz.co.hmy.pis.repository.RefreshTokenRepository;
 
@@ -51,7 +50,7 @@ class RefreshTokenTest {
 
     @BeforeEach
     void createOfficer() {
-        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of(Role.OFFICER)));
+        users.save(new AppUser("officer", encoder.encode("officer-pass"), "Test Officer", Set.of("OFFICER")));
     }
 
     private Pair login() throws Exception {
@@ -142,7 +141,7 @@ class RefreshTokenTest {
         Pair before = login();
         assertThat(rolesIn(before.access())).isEqualTo("[\"OFFICER\"]");
 
-        users.findByUsername("officer").orElseThrow().getRoles().add(Role.APPROVER);
+        users.findByUsername("officer").orElseThrow().getRoles().add("APPROVER");
         users.flush();
 
         Pair after = pair(refresh(before.refresh()));

@@ -2,7 +2,7 @@
 
 Securing a real Spring Boot API step by step: the **Procurement Information
 System (PIS)** goes from wide open to one account per person, signed tokens,
-refresh tokens, permissions, and finally a separate OAuth2 authorization server.
+refresh tokens, permissions, roles managed in the database, and finally a separate OAuth2 authorization server.
 Every lesson ends with tests you can run.
 
 ## Start here
@@ -18,7 +18,7 @@ This README is also the home page of the course website: **https://massoudhamad.
 | Folder | What it is | Port |
 | --- | --- | --- |
 | [`procurement-information-system_v1.0/`](procurement-information-system_v1.0/) | **The project students work on.** Lesson 1 is applied; the lessons show how to add the rest. | 8080 |
-| [`pis-security-demo/`](pis-security-demo/) | **The reference solution:** the same project with Lessons 1–3C finished, plus a smoke-test script per lesson. | 8099 |
+| [`pis-security-demo/`](pis-security-demo/) | **The reference solution:** the same project with Lessons 1–3D finished, plus a smoke-test script per lesson. | 8099 |
 | [`pis-lecture4-authorization-server/`](pis-lecture4-authorization-server/) | **Lecture 4:** a Spring Authorization Server and PIS as a pure OAuth2 resource server. | 9100, 8181 |
 
 ## The lessons
@@ -30,6 +30,7 @@ This README is also the home page of the course website: **https://massoudhamad.
 | 3 | [Tokens and JWT](procurement-information-system_v1.0/docs/lessons/03-jwt.md) | PIS project |
 | 3B | [Refresh tokens](procurement-information-system_v1.0/docs/lessons/03b-refresh-tokens.md) | PIS project |
 | 3C | [Permissions and method security](procurement-information-system_v1.0/docs/lessons/03c-permissions.md) | PIS project |
+| 3D | [Roles and permissions in the database](procurement-information-system_v1.0/docs/lessons/03d-roles-in-database.md) | PIS project |
 | 4 | [OAuth2 with Spring Authorization Server](pis-lecture4-authorization-server/LECTURE.md) | Lecture 4 project |
 | 5 | OAuth2 with Keycloak | planned |
 | 6 | Log in with Google / GitHub | planned |

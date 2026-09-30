@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tz.co.hmy.pis.dto.UserEnabledRequest;
 import tz.co.hmy.pis.dto.UserRequest;
 import tz.co.hmy.pis.dto.UserResponse;
+import tz.co.hmy.pis.dto.UserRolesRequest;
 import tz.co.hmy.pis.service.UserService;
 
 import java.util.List;
@@ -53,5 +54,11 @@ public class UserController {
     public UserResponse setEnabled(@PathVariable UUID id,
                                    @Valid @RequestBody UserEnabledRequest request) {
         return service.setEnabled(id, request.enabled());
+    }
+
+    @Operation(summary = "Replace an account's roles (ADMIN)")
+    @PutMapping("/{id}/roles")
+    public UserResponse setRoles(@PathVariable UUID id, @Valid @RequestBody UserRolesRequest request) {
+        return service.setRoles(id, request.roles());
     }
 }

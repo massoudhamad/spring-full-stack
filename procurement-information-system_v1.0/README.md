@@ -15,6 +15,7 @@ upgrades this project, and each one ends with tests you can run.
 | 3 | [Tokens and JWT](docs/lessons/03-jwt.md) | Log in once, then `Bearer` tokens |
 | 3B | [Refresh tokens](docs/lessons/03b-refresh-tokens.md) | 5-minute tokens, rotation, logout |
 | 3C | [Permissions and method security](docs/lessons/03c-permissions.md) | `hasAuthority`, `@PreAuthorize`, nobody approves their own requisition |
+| 3D | [Roles and permissions in the database](docs/lessons/03d-roles-in-database.md) | Roles as data, an admin API for them, guard rails |
 
 - **[Testing guide](docs/lessons/TESTING.md):** test each lesson step by step: the command, what you should see, and what to check if it doesn't match.
 - **[Course index](docs/lessons/):** the full course map, including the OAuth2 lectures.

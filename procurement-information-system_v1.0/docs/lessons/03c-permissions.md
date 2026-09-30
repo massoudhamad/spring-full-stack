@@ -1456,8 +1456,8 @@ PASS  200  approver approves the admin's
 
 ## Next
 
-**→ [Lecture 4 — OAuth2 with Spring Authorization Server](../../../pis-lecture4-authorization-server/LECTURE.md).**
-Lecture 4 starts from Lesson 3B, so the permissions from this lesson aren't in
-it. Exercise idea: add a `permissions` claim in the auth server's
-`rolesClaim()` customizer, and switch `pis-api`'s rules to `hasAuthority(...)`,
-the same way you did here.
+**→ [Lesson 3D — Roles and Permissions in the Database](03d-roles-in-database.md)** takes
+this lesson's Exercise 5 further: roles move into tables, with an admin API to
+change them while PIS runs.
+
+After that, **[Lecture 4 — OAuth2 with Spring Authorization Server](../../../pis-lecture4-authorization-server/LECTURE.md)**.

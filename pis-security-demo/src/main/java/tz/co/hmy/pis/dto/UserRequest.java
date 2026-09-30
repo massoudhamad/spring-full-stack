@@ -1,7 +1,6 @@
 package tz.co.hmy.pis.dto;
 
 import jakarta.validation.constraints.*;
-import tz.co.hmy.pis.model.Role;
 
 import java.util.Set;
 
@@ -23,5 +22,5 @@ public record UserRequest(
         String fullName,
 
         @NotEmpty(message = "at least one role is required")
-        Set<Role> roles
+        Set<@Pattern(regexp = "[A-Z_]{2,20}", message = "role names are 2-20 capital letters or underscores") String> roles
 ) { }

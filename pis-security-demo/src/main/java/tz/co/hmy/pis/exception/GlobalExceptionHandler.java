@@ -2,6 +2,7 @@ package tz.co.hmy.pis.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,6 +70,17 @@ public class GlobalExceptionHandler {
     public ProblemDetail onInvalidRefreshToken(InvalidRefreshTokenException ex) {
         return problem(HttpStatus.UNAUTHORIZED, "Invalid refresh token",
                 "The refresh token is invalid, expired or revoked. Log in again.", "invalid-refresh-token");
+    }
+
+    /**
+     * The body isn't valid JSON, or holds a value that can't be converted, such
+     * as an unknown permission name. Without this it fell through to the
+     * catch-all and became a 500.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail onUnreadableBody(HttpMessageNotReadableException ex) {
+        return problem(HttpStatus.BAD_REQUEST, "Malformed request",
+                "The request body is not valid JSON, or contains a value that is not allowed", "malformed-request");
     }
 
     /**
