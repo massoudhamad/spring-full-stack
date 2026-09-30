@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: procurement-information-system
+
+  datasource:
+    # No defaults: credentials come from .env, which is gitignored.
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false          # a lazy load in the view layer is a query nobody planned
+    hibernate:
+      ddl-auto: validate         # Flyway owns the schema, never Hibernate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    default-property-inclusion: non_null
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # The only place PIS names its authorization server. Spring reads
+          # <issuer>/.well-known/openid-configuration, finds the public keys
+          # (jwks_uri), and rejects any token whose "iss" is different.
+          issuer-uri: ${AUTH_ISSUER:http://localhost:9100}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+server:
+  port: ${SERVER_PORT}
+  error:
+    include-message: never       # errors go through GlobalExceptionHandler

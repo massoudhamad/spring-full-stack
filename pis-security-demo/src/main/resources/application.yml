@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: procurement-information-system
+
+  datasource:
+    # No defaults: credentials come from .env, which is gitignored.
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false          # a lazy load in the view layer is a query nobody planned
+    hibernate:
+      ddl-auto: validate         # Flyway owns the schema, never Hibernate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    default-property-inclusion: non_null
+
+# Password for the first admin, created on startup only while app_user is empty.
+# Every other account is created through POST /api/v1/users.
+pis:
+  security:
+    admin-password: ${ADMIN_PASSWORD}
+    jwt:
+      # HS256 needs at least 32 bytes. Generate one with:  openssl rand -base64 32
+      secret: ${JWT_SECRET}
+      # Short, now that a refresh token can buy a new one: this is the longest
+      # a disabled account or a stolen access token keeps working.
+      expiry: 5m
+      refresh-expiry: 8h
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+server:
+  port: ${SERVER_PORT}
+  error:
+    include-message: never       # errors go through GlobalExceptionHandler

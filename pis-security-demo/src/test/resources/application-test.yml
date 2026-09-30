@@ -1,0 +1,28 @@
+# Tests run against a real PostgreSQL, on a separate database.
+#
+#   createdb pis_test --owner=pis
+#
+# Not H2. H2 accepts SQL that PostgreSQL rejects, so a green H2 suite tells you
+# very little about the database you actually deploy to.
+spring:
+  datasource:
+    url: ${TEST_DB_URL}
+    username: ${TEST_DB_USER}
+    password: ${TEST_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+# Fixed, fake passwords so SecurityTest does not depend on anyone's .env.
+pis:
+  security:
+    admin-password: admin-pass
+    jwt:
+      secret: test-only-secret-that-is-at-least-32-bytes-long
+      expiry: 30m
+      refresh-expiry: 8h

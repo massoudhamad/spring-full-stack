@@ -1,0 +1,28 @@
+server:
+  port: ${SERVER_PORT:9100}
+
+spring:
+  application:
+    name: pis-auth-server
+
+# Everything secret comes from .env (see .env.example). No defaults on purpose:
+# a missing value stops the server instead of starting with a guessable secret.
+pis:
+  auth:
+    # The "iss" claim in every token. Resource servers must use exactly this URL.
+    issuer: ${AUTH_ISSUER:http://localhost:9100}
+    users:
+      officer-password: ${OFFICER_PASSWORD}
+      approver-password: ${APPROVER_PASSWORD}
+      admin-password: ${ADMIN_PASSWORD}
+    clients:
+      bff-secret: ${PIS_BFF_SECRET}
+      reporting-secret: ${PIS_REPORTING_SECRET}
+      # Where the browser is sent back with the authorization code.
+      redirect-uri: ${PIS_REDIRECT_URI:http://127.0.0.1:3000/callback}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

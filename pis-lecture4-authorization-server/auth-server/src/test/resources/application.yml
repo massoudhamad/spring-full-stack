@@ -1,0 +1,12 @@
+# Fixed, fake values so the tests pass on every machine, whatever is in .env.
+pis:
+  auth:
+    issuer: http://localhost:9100
+    users:
+      officer-password: officer-pass
+      approver-password: approver-pass
+      admin-password: admin-pass
+    clients:
+      bff-secret: bff-secret
+      reporting-secret: reporting-secret
+      redirect-uri: http://127.0.0.1:3000/callback

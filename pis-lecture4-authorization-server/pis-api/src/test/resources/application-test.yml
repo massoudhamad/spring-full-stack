@@ -1,0 +1,26 @@
+# Tests run against a real PostgreSQL, on a separate database.
+#
+#   createdb pis_test --owner=pis
+#
+# Not H2. H2 accepts SQL that PostgreSQL rejects, so a green H2 suite tells you
+# very little about the database you actually deploy to.
+spring:
+  datasource:
+    url: ${TEST_DB_URL}
+    username: ${TEST_DB_USER}
+    password: ${TEST_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Never contacted by the tests: jwt() in MockMvc skips decoding entirely.
+          issuer-uri: http://localhost:9100

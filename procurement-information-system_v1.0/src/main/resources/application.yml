@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: procurement-information-system
+
+  datasource:
+    # No defaults: credentials come from .env, which is gitignored.
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false          # a lazy load in the view layer is a query nobody planned
+    hibernate:
+      ddl-auto: validate         # Flyway owns the schema, never Hibernate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    default-property-inclusion: non_null
+
+# Demo users for HTTP Basic. Passwords come from .env, never from this file.
+pis:
+  security:
+    officer-password: ${OFFICER_PASSWORD}
+    approver-password: ${APPROVER_PASSWORD}
+    admin-password: ${ADMIN_PASSWORD}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+server:
+  port: ${SERVER_PORT}
+  error:
+    include-message: never       # errors go through GlobalExceptionHandler
