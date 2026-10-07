@@ -3,6 +3,9 @@
 Two PIS services that find each other **by name**, through Eureka, behind one
 API gateway. The lecture is in [`LECTURE.md`](LECTURE.md).
 
+**Want to build it yourself?** [`BUILD-STEPS.md`](BUILD-STEPS.md) takes you through it one
+file at a time: which file to create or edit, its full content, and a check after each part.
+
 ```
 pis-lecture5-gateway-eureka/
 ├── discovery-server/        Eureka server                       :8761  dashboard: http://localhost:8761
