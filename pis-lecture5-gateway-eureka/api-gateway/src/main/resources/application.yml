@@ -1,0 +1,54 @@
+server:
+  port: ${PORT:8300}
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    loadbalancer:
+      cache:
+        ttl: 5s
+    gateway:
+      server:
+        webflux:
+          routes:
+            # lb:// means "a service name: ask Eureka, then load-balance across its copies".
+            - id: suppliers
+              uri: lb://supplier-service
+              predicates:
+                - Path=/api/suppliers/**
+            - id: purchase-orders
+              uri: lb://purchase-order-service
+              predicates:
+                - Path=/api/purchase-orders/**
+          default-filters:
+            # Added to every response, so you can see a request came through the gateway.
+            - AddResponseHeader=X-Gateway, pis-api-gateway
+            # If a copy can't be reached, try again: the load balancer picks the NEXT copy.
+            # GET only: repeating a POST could create the same purchase order twice.
+            - name: Retry
+              args:
+                retries: 2
+                methods: GET
+                series: SERVER_ERROR
+                exceptions: java.io.IOException, java.util.concurrent.TimeoutException
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    registry-fetch-interval-seconds: 5
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15
+
+management:
+  endpoint:
+    gateway:
+      access: read-only              # off by default: switch it on, read-only
+  endpoints:
+    web:
+      exposure:
+        include: health, gateway     # /actuator/gateway/routes lists the routes above

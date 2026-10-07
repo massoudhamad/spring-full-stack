@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8201}             # run a second copy with  PORT=8211 mvn spring-boot:run
+
+spring:
+  application:
+    name: supplier-service       # the name it registers under, and the name others call it by
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    registry-fetch-interval-seconds: 5        # development: notice changes in seconds
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}   # unique per copy
+    lease-renewal-interval-in-seconds: 5      # heartbeat every 5 s (default 30)
+    lease-expiration-duration-in-seconds: 15  # gone after 15 s of silence (default 90)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

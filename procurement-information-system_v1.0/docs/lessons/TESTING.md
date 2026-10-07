@@ -19,6 +19,7 @@ on your machine; the status codes and the fields should not.
 | [3C · Permissions and method security](#lesson-3c--permissions-and-method-security) | `PermissionTest` (8 tests) | yes | 9 |
 | [3D · Roles and permissions in the database](#lesson-3d--roles-and-permissions-in-the-database) | `RoleApiTest` (10 tests) | yes | 9 |
 | [4 · OAuth2 with Spring Authorization Server](#lecture-4--oauth2-with-spring-authorization-server) | both apps (8 + 15 tests) | both apps | 9 |
+| [5 · API gateway and service discovery](#lecture-5--api-gateway-and-service-discovery) | four apps (17 tests) | all five apps | 9 |
 
 ## Before you start: set your variables
 
@@ -1166,6 +1167,194 @@ curl -s -o /dev/null -w '%{http_code}\n' -u officer:officer123 $API/api/v1/suppl
 ```
 
 ✅ **Lecture 4 passes** when every step above matches.
+
+---
+
+## Lecture 5 — API gateway and service discovery
+
+**You need:** All five apps of `pis-lecture5-gateway-eureka/` running: discovery-server first, then supplier-service on 8201 **and** 8211, purchase-order-service, and api-gateway (see its README). No database.
+
+Set these variables too:
+
+```bash
+EUREKA=http://localhost:8761      # discovery-server
+GATEWAY=http://localhost:8300     # api-gateway: the only address a client needs
+JSON='Content-Type: application/json'
+```
+
+### Step 1 · Run the unit tests of all four apps
+
+They need nothing running: each app is tested on its own, with a stub standing in for the others.
+
+```bash
+cd pis-lecture5-gateway-eureka
+for app in discovery-server supplier-service purchase-order-service api-gateway; do
+  (cd $app && mvn -q test > /dev/null && echo "$app: all tests pass" || echo "$app: TESTS FAILED")
+done
+```
+
+**You should see** All four say `all tests pass` (2 + 4 + 7 + 4 = 17 tests):
+
+```
+discovery-server: all tests pass
+supplier-service: all tests pass
+purchase-order-service: all tests pass
+api-gateway: all tests pass
+```
+
+> **If not:** Run each app's `mvn test` on its own to see which test failed.
+
+### Step 2 · Who is registered in Eureka?
+
+Every app registers itself on start-up. Two copies of supplier-service are running.
+
+```bash
+curl -s -H 'Accept: application/json' $EUREKA/eureka/apps \
+  | jq -r '.applications.application[] | "\(.name): \([.instance[].instanceId] | sort | join(", "))"'
+```
+
+**You should see** SUPPLIER-SERVICE with two instances (8201 and 8211), PURCHASE-ORDER-SERVICE and API-GATEWAY:
+
+```
+SUPPLIER-SERVICE: supplier-service:8201, supplier-service:8211
+API-GATEWAY: api-gateway:8300
+PURCHASE-ORDER-SERVICE: purchase-order-service:8202
+```
+
+> **If not:** A service is missing: it hasn't started yet, or it wasn't started at all. Its own log says "registration status: 204" once it has registered.
+
+### Step 3 · The gateway's routes
+
+Two routes, each pointing at a service NAME (`lb://`), not an address.
+
+```bash
+curl -s $GATEWAY/actuator/gateway/routes | jq -c '.[] | {route_id, uri}'
+```
+
+**You should see** The `suppliers` and `purchase-orders` routes with their `lb://` URIs:
+
+```
+{"route_id":"suppliers","uri":"lb://supplier-service"}
+{"route_id":"purchase-orders","uri":"lb://purchase-order-service"}
+```
+
+> **If not:** `404`: the `gateway` endpoint isn't switched on (`management.endpoint.gateway.access`).
+
+### Step 4 · A request through the gateway
+
+The client only knows port 8300. The response says which copy answered, and that it came through the gateway.
+
+```bash
+curl -s -D - -o /dev/null $GATEWAY/api/suppliers/S-001 | grep -iE '^(HTTP|x-served-by|x-gateway)'
+```
+
+**You should see** `200`, an `X-Served-By` header, and `X-Gateway: pis-api-gateway`:
+
+```
+HTTP/1.1 200 OK
+X-Served-By: supplier-service:8211
+X-Gateway: pis-api-gateway
+```
+
+> **If not:** `503`: no copy of supplier-service is registered (yet). Wait a few seconds after starting it.
+
+### Step 5 · Load balancing: six calls, two copies
+
+Round robin: the gateway asks Eureka for the copies and takes turns.
+
+```bash
+for i in 1 2 3 4 5 6; do
+  curl -s -D - -o /dev/null $GATEWAY/api/suppliers | grep -i '^x-served-by'
+done
+```
+
+**You should see** The two copies taking turns:
+
+```
+X-Served-By: supplier-service:8201
+X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
+X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
+X-Served-By: supplier-service:8211
+```
+
+> **If not:** Always the same copy: the second copy isn't registered, or the load balancer's 5-second cache hasn't refreshed yet.
+
+### Step 6 · A purchase order: one service asks the other, by name
+
+purchase-order-service calls `http://supplier-service/...`. Eureka turns the name into a running copy, and `checkedBy` shows which one.
+
+```bash
+curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
+  -d '{"supplierId":"S-001","item":"Laptop","quantity":2,"unitPrice":2500000.00}' | jq -c '{id, supplierName, total, checkedBy}'
+```
+
+**You should see** `201` with the supplier's name and `checkedBy` naming a copy of supplier-service:
+
+```
+{"id":"PO-0009","supplierName":"Kisiwa ICT Consultants","total":5000000.00,"checkedBy":"supplier-service:8201"}
+```
+
+> **If not:** `503 Supplier service unavailable`: no copy of supplier-service is registered.
+
+### Step 7 · The next order is checked by the other copy
+
+Load balancing works between services too, not just at the gateway.
+
+```bash
+for i in 1 2; do
+  curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
+    -d '{"supplierId":"S-002","item":"Paper","quantity":5,"unitPrice":12000}' | jq -c '{id, checkedBy}'
+done
+```
+
+**You should see** Two orders, two different `checkedBy` copies:
+
+```
+{"id":"PO-0010","checkedBy":"supplier-service:8211"}
+{"id":"PO-0011","checkedBy":"supplier-service:8201"}
+```
+
+### Step 8 · A rule that needs the other service
+
+Only an ACTIVE supplier can receive an order, and only supplier-service knows the status.
+
+```bash
+curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
+  -d '{"supplierId":"S-003","item":"Cement","quantity":10,"unitPrice":18000}' | jq -c '{status, detail}'
+curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
+  -d '{"supplierId":"S-999","item":"Cement","quantity":10,"unitPrice":18000}' | jq -c '{status, detail}'
+```
+
+**You should see** `422` for the suspended supplier and `422` for the unknown one:
+
+```
+{"status":422,"detail":"Supplier S-003 is SUSPENDED, so it can't receive purchase orders"}
+{"status":422,"detail":"Unknown supplier S-999"}
+```
+
+### Step 9 · Stop one copy: nothing breaks
+
+Press **Ctrl+C** in the terminal running supplier-service on **8211**, then run this straight away. It unregisters from Eureka as it stops, and the gateway's Retry filter covers the few seconds before everyone has noticed.
+
+```bash
+for i in $(seq 1 10); do
+  curl -s -o /dev/null -w '%{http_code} ' $GATEWAY/api/suppliers; sleep 0.5
+done; echo
+curl -s -H 'Accept: application/json' $EUREKA/eureka/apps/SUPPLIER-SERVICE | jq -r '[.application.instance[].instanceId] | join(", ")'
+```
+
+**You should see** Ten `200`s, and only `supplier-service:8201` left in Eureka. Start 8211 again afterwards.:
+
+```
+200 200 200 200 200 200 200 200 200 200 
+supplier-service:8201
+```
+
+> **If not:** Some `500`s: the `Retry` default filter is missing from the gateway's `application.yml`.
+
+✅ **Lecture 5 passes** when every step above matches.
 
 ---
 
