@@ -16,6 +16,7 @@ client ──► api-gateway :8300  │           │
             │  /api/suppliers/** ──► supplier-service  :8201, :8211   (two copies)
             │  /api/purchase-orders/** ──► purchase-order-service :8202 ──┘
             │                               calls http://supplier-service/... BY NAME
+            │  /swagger-ui.html  ──► one Swagger UI showing both services' APIs
 ```
 
 | Duration | Builds on | Project |
@@ -30,7 +31,7 @@ client ──► api-gateway :8300  │           │
 > **Complete files.** Every code block is a complete file with its `package` and
 > `import` lines, taken from the tested project.
 
-> **Build it yourself.** [`BUILD-STEPS.md`](BUILD-STEPS.md) is the same project as 42
+> **Build it yourself.** [`BUILD-STEPS.md`](BUILD-STEPS.md) is the same project as 53
 > numbered steps: which file to create or edit, in which order, with a check after each part.
 
 ---
@@ -47,6 +48,7 @@ By the end of this lecture you can:
 - Measure what happens when a copy stops, or crashes, and make it invisible to users with retries.
 - Answer honestly when another service is down: 503, not 500.
 - Test services that depend on discovery, with no Eureka running.
+- Show every service's API in one Swagger UI at the gateway, with "Try it out" going through the gateway.
 
 ### Lesson plan
 
@@ -54,7 +56,7 @@ By the end of this lecture you can:
 | --- | --- |
 | 0–25 | Concepts: why discovery; registry, heartbeats, leases; client-side load balancing; the gateway |
 | 25–35 | Request flow |
-| 35–110 | Build it: discovery server, supplier-service, purchase-order-service, gateway |
+| 35–110 | Build it: discovery server, supplier-service, purchase-order-service, gateway, Swagger UI at the gateway |
 | 110–140 | Try it: five terminals; load balancing; a copy stops, a copy crashes |
 | 140–180 | Tests, exercises, quiz |
 
@@ -290,6 +292,7 @@ Its data lives in memory: this lecture is about finding services, not storing da
         <java.version>17</java.version>
         <!-- The Spring Cloud release line built for Spring Boot 3.5 -->
         <spring-cloud.version>2025.0.3</spring-cloud.version>
+        <springdoc.version>2.8.17</springdoc.version>
     </properties>
 
     <dependencyManagement>
@@ -308,6 +311,12 @@ Its data lives in memory: this lecture is about finding services, not storing da
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Publishes this service's OpenAPI description at /v3/api-docs (no UI: the gateway shows it) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -338,6 +347,9 @@ Its data lives in memory: this lecture is about finding services, not storing da
 ```yaml
 # supplier-service/src/main/resources/application.yml
 server:
+  # Trust the X-Forwarded-* headers the gateway adds, so the API description
+  # names the gateway's address, and Swagger's "Try it out" goes through it.
+  forward-headers-strategy: framework
   port: ${PORT:8201}             # run a second copy with  PORT=8211 mvn spring-boot:run
 
 spring:
@@ -369,6 +381,8 @@ instances. `PORT` lets you start the second copy without editing anything.
 // supplier-service/src/main/java/tz/co/hmy/supplier/SupplierServiceApplication.java
 package tz.co.hmy.supplier;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -377,6 +391,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * as "supplier-service" (spring.application.name) on start-up: no annotation needed.
  */
 @SpringBootApplication
+@OpenAPIDefinition(info = @Info(title = "Supplier Service", version = "v1",
+        description = "Owns suppliers. Reached through the API gateway."))
 public class SupplierServiceApplication {
 
     public static void main(String[] args) {
@@ -544,6 +560,7 @@ public class ServedByFilter extends OncePerRequestFilter {
         <java.version>17</java.version>
         <!-- The Spring Cloud release line built for Spring Boot 3.5 -->
         <spring-cloud.version>2025.0.3</spring-cloud.version>
+        <springdoc.version>2.8.17</springdoc.version>
     </properties>
 
     <dependencyManagement>
@@ -562,6 +579,12 @@ public class ServedByFilter extends OncePerRequestFilter {
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Publishes this service's OpenAPI description at /v3/api-docs (no UI: the gateway shows it) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -601,6 +624,9 @@ public class ServedByFilter extends OncePerRequestFilter {
 ```yaml
 # purchase-order-service/src/main/resources/application.yml
 server:
+  # Trust the X-Forwarded-* headers the gateway adds, so the API description
+  # names the gateway's address, and Swagger's "Try it out" goes through it.
+  forward-headers-strategy: framework
   port: ${PORT:8202}
 
 spring:
@@ -899,11 +925,15 @@ public record PurchaseOrderRequest(
 // purchase-order-service/src/main/java/tz/co/hmy/purchaseorder/PurchaseOrderServiceApplication.java
 package tz.co.hmy.purchaseorder;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /** Owns purchase orders. Registers in Eureka as "purchase-order-service". */
 @SpringBootApplication
+@OpenAPIDefinition(info = @Info(title = "Purchase Order Service", version = "v1",
+        description = "Owns purchase orders. Checks suppliers with supplier-service."))
 public class PurchaseOrderServiceApplication {
 
     public static void main(String[] args) {
@@ -942,6 +972,7 @@ Spring Cloud Gateway runs on **WebFlux**, the reactive web stack, so its
         <java.version>17</java.version>
         <!-- The Spring Cloud release line built for Spring Boot 3.5 -->
         <spring-cloud.version>2025.0.3</spring-cloud.version>
+        <springdoc.version>2.8.17</springdoc.version>
     </properties>
 
     <dependencyManagement>
@@ -965,6 +996,12 @@ Spring Cloud Gateway runs on **WebFlux**, the reactive web stack, so its
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!-- One Swagger UI for every service, served by the gateway (WebFlux flavour) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -1027,6 +1064,15 @@ spring:
     gateway:
       server:
         webflux:
+          # Send X-Forwarded-* headers to the services, so their API descriptions (Swagger)
+          # name the GATEWAY's address. Gateway 4.x only sends them for requests from a
+          # trusted proxy: here, this machine. In production: your load balancer's addresses.
+          trusted-proxies: 127\.0\.0\.1|0:0:0:0:0:0:0:1
+          x-forwarded:
+            # The docs routes rewrite /supplier-service/v3/api-docs to /v3/api-docs. Without
+            # this, that removed "/supplier-service" is reported as a prefix, and Swagger's
+            # "Try it out" would call /supplier-service/api/suppliers, which no route matches.
+            prefix-enabled: false
           routes:
             # lb:// means "a service name: ask Eureka, then load-balance across its copies".
             - id: suppliers
@@ -1037,6 +1083,19 @@ spring:
               uri: lb://purchase-order-service
               predicates:
                 - Path=/api/purchase-orders/**
+            # Each service's API description, fetched through the gateway for Swagger UI.
+            - id: supplier-service-docs
+              uri: lb://supplier-service
+              predicates:
+                - Path=/supplier-service/v3/api-docs
+              filters:
+                - RewritePath=/supplier-service/v3/api-docs, /v3/api-docs
+            - id: purchase-order-service-docs
+              uri: lb://purchase-order-service
+              predicates:
+                - Path=/purchase-order-service/v3/api-docs
+              filters:
+                - RewritePath=/purchase-order-service/v3/api-docs, /v3/api-docs
           default-filters:
             # Added to every response, so you can see a request came through the gateway.
             - AddResponseHeader=X-Gateway, pis-api-gateway
@@ -1048,6 +1107,16 @@ spring:
                 methods: GET
                 series: SERVER_ERROR
                 exceptions: java.io.IOException, java.util.concurrent.TimeoutException
+
+# One Swagger UI at http://localhost:8300/swagger-ui.html, with a drop-down per service.
+springdoc:
+  swagger-ui:
+    urls-primary-name: supplier-service      # the definition shown first
+    urls:
+      - name: supplier-service
+        url: /supplier-service/v3/api-docs
+      - name: purchase-order-service
+        url: /purchase-order-service/v3/api-docs
 
 eureka:
   client:
@@ -1073,6 +1142,53 @@ management:
 > **Why retry only `GET`?** A `GET` can be repeated safely. Repeating a `POST`
 > could create the same purchase order twice. Inside purchase-order-service,
 > the supplier lookup is a `GET`, so its load balancer retries it too.
+
+### 5 · One Swagger UI at the gateway
+
+Each service describes its own API, and the gateway shows every description in
+**one** Swagger UI: http://localhost:8300/swagger-ui.html, with a drop-down to
+pick the service. The code is already in the files above; this is how the
+pieces fit together.
+
+| Where | What | Why |
+| --- | --- | --- |
+| Each service's `pom.xml` | `springdoc-openapi-starter-webmvc-api` | Publishes the API description at `/v3/api-docs`. The `-api` starter has no UI: the gateway shows it |
+| The gateway's `pom.xml` | `springdoc-openapi-starter-webflux-ui` | The UI, in its **WebFlux** flavour. The `webmvc` one would bring Spring MVC, and the gateway wouldn't start |
+| Each `…Application.java` | `@OpenAPIDefinition(info = @Info(title = …))` | The title and description at the top of each definition |
+| The gateway's routes `supplier-service-docs` and `purchase-order-service-docs` | `/supplier-service/v3/api-docs` is rewritten to `/v3/api-docs` and sent to `lb://supplier-service` | Both services publish at the same path, so the gateway gives each its own |
+| The gateway's `springdoc.swagger-ui.urls` | One entry per service | The drop-down, pointing at the two routes above |
+
+```
+browser ──► gateway /swagger-ui.html                      (the UI itself)
+        ──► gateway /supplier-service/v3/api-docs  ──RewritePath──►  supplier-service /v3/api-docs
+        ──► "Try it out": gateway /api/suppliers   ──────────────►  supplier-service /api/suppliers
+```
+
+**"Try it out" must go through the gateway too.** Swagger sends requests to the
+`servers` address written in the description, and a service writes the address
+it was called on. Three settings make that the gateway's address. This is what
+each one changed, measured while building the lecture:
+
+| Settings | `servers` in supplier-service's description | "Try it out" calls |
+| --- | --- | --- |
+| None of them | `http://localhost:8201` | the service directly, bypassing the gateway (and the other copy) |
+| `forward-headers-strategy` + `trusted-proxies` | `http://localhost:8300/supplier-service` | a path no route matches: 404 |
+| All three | `http://localhost:8300` | the gateway, which load-balances as usual |
+
+1. **`server.forward-headers-strategy: framework`** (each service). The gateway
+   tells the service the original address in `X-Forwarded-Host`, `-Port` and
+   `-Proto` headers. By default the service ignores them; with this it uses them.
+2. **`trusted-proxies`** (gateway). Gateway 4.x only sends `X-Forwarded-*`
+   headers for requests that come from a trusted address. Here that is this
+   machine. Never use `.*`: anyone could then claim to be a proxy.
+3. **`x-forwarded.prefix-enabled: false`** (gateway). `RewritePath` removed
+   `/supplier-service` from the path, and the gateway reports a removed path as
+   `X-Forwarded-Prefix`. Here that prefix belongs to the docs route only, not to
+   the API, so it must not be sent.
+
+> **In production**, Swagger UI is a map of your API for anyone who can reach
+> it. Protect it at the gateway, or switch it off there with
+> `springdoc.swagger-ui.enabled: false`.
 
 ---
 
@@ -1102,7 +1218,7 @@ API-GATEWAY: api-gateway:8300
 PURCHASE-ORDER-SERVICE: purchase-order-service:8202
 ```
 
-**2 · The gateway's routes** Two routes, each pointing at a service NAME (`lb://`), not an address.
+**2 · The gateway's routes** Each route points at a service NAME (`lb://`), not an address. Two carry the API; two fetch each service's API description for Swagger UI.
 
 ```bash
 curl -s $GATEWAY/actuator/gateway/routes | jq -c '.[] | {route_id, uri}'
@@ -1110,6 +1226,8 @@ curl -s $GATEWAY/actuator/gateway/routes | jq -c '.[] | {route_id, uri}'
 ```
 {"route_id":"suppliers","uri":"lb://supplier-service"}
 {"route_id":"purchase-orders","uri":"lb://purchase-order-service"}
+{"route_id":"supplier-service-docs","uri":"lb://supplier-service"}
+{"route_id":"purchase-order-service-docs","uri":"lb://purchase-order-service"}
 ```
 
 **3 · A request through the gateway** The client only knows port 8300. The response says which copy answered, and that it came through the gateway.
@@ -1119,7 +1237,7 @@ curl -s -D - -o /dev/null $GATEWAY/api/suppliers/S-001 | grep -iE '^(HTTP|x-serv
 ```
 ```
 HTTP/1.1 200 OK
-X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
 X-Gateway: pis-api-gateway
 ```
 
@@ -1131,12 +1249,12 @@ for i in 1 2 3 4 5 6; do
 done
 ```
 ```
-X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
 X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
 X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
 ```
 
 **5 · A purchase order: one service asks the other, by name** purchase-order-service calls `http://supplier-service/...`. Eureka turns the name into a running copy, and `checkedBy` shows which one.
@@ -1146,7 +1264,7 @@ curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
   -d '{"supplierId":"S-001","item":"Laptop","quantity":2,"unitPrice":2500000.00}' | jq -c '{id, supplierName, total, checkedBy}'
 ```
 ```
-{"id":"PO-0009","supplierName":"Kisiwa ICT Consultants","total":5000000.00,"checkedBy":"supplier-service:8201"}
+{"id":"PO-0007","supplierName":"Kisiwa ICT Consultants","total":5000000.00,"checkedBy":"supplier-service:8201"}
 ```
 
 **6 · The next order is checked by the other copy** Load balancing works between services too, not just at the gateway.
@@ -1158,8 +1276,8 @@ for i in 1 2; do
 done
 ```
 ```
-{"id":"PO-0010","checkedBy":"supplier-service:8211"}
-{"id":"PO-0011","checkedBy":"supplier-service:8201"}
+{"id":"PO-0008","checkedBy":"supplier-service:8211"}
+{"id":"PO-0009","checkedBy":"supplier-service:8201"}
 ```
 
 **7 · A rule that needs the other service** Only an ACTIVE supplier can receive an order, and only supplier-service knows the status.
@@ -1174,6 +1292,23 @@ curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
 {"status":422,"detail":"Supplier S-003 is SUSPENDED, so it can't receive purchase orders"}
 {"status":422,"detail":"Unknown supplier S-999"}
 ```
+
+**8 · Swagger UI through the gateway** One Swagger UI for both services. Its drop-down lists each service's description, fetched through the gateway, and each description names the gateway as its server, so "Try it out" goes through the gateway too.
+
+```bash
+curl -s $GATEWAY/v3/api-docs/swagger-config | jq -c '.urls[]'
+for svc in supplier-service purchase-order-service; do
+  curl -s $GATEWAY/$svc/v3/api-docs | jq -c '{title: .info.title, servers: [.servers[].url], paths: (.paths | keys)}'
+done
+```
+```
+{"url":"/purchase-order-service/v3/api-docs","name":"purchase-order-service"}
+{"url":"/supplier-service/v3/api-docs","name":"supplier-service"}
+{"title":"Supplier Service","servers":["http://localhost:8300"],"paths":["/api/suppliers","/api/suppliers/{id}"]}
+{"title":"Purchase Order Service","servers":["http://localhost:8300"],"paths":["/api/purchase-orders","/api/purchase-orders/{id}"]}
+```
+
+Then open http://localhost:8300/swagger-ui.html in a browser. Pick **supplier-service** in the "Select a definition" drop-down, open `GET /api/suppliers`, press **Try it out**, then **Execute**. The response headers include `x-gateway: pis-api-gateway`: the request went through the gateway.
 
 The full set of steps, including the unit tests and stopping a copy, is in the
 [testing guide](../procurement-information-system_v1.0/docs/lessons/TESTING.md).
@@ -1333,6 +1468,24 @@ class PurchaseOrderApiTest {
         mvc.perform(get("/api/purchase-orders/PO-9999")).andExpect(status().isNotFound());
     }
 
+    @Test
+    void publishes_its_api_description_for_swagger() throws Exception {
+        mvc.perform(get("/v3/api-docs"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.info.title").value("Purchase Order Service"))
+            .andExpect(jsonPath("$.paths['/api/purchase-orders']").exists());
+    }
+
+    /** Behind the gateway, the description names the GATEWAY, so Swagger's "Try it out" goes through it. */
+    @Test
+    void the_description_names_the_gateway_when_called_through_it() throws Exception {
+        mvc.perform(get("/v3/api-docs")
+                .header("X-Forwarded-Proto", "http")
+                .header("X-Forwarded-Host", "localhost:8300")
+                .header("X-Forwarded-Port", "8300"))
+            .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8300"));
+    }
+
     // ------------------------------------------------------------ the stub supplier-service
 
     private static HttpServer startStub() {
@@ -1477,11 +1630,39 @@ class GatewayRoutingTest {
             .jsonPath("$[?(@.route_id == 'purchase-orders')].uri").isEqualTo("lb://purchase-order-service");
     }
 
+    // ------------------------------------------------------------ Swagger UI at the gateway
+
+    @Test
+    void swagger_ui_is_served_by_the_gateway() {
+        web.get().uri("/swagger-ui.html").exchange()
+            .expectStatus().is3xxRedirection()
+            .expectHeader().valueEquals("Location", "/swagger-ui/index.html");
+        web.get().uri("/swagger-ui/index.html").exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void the_swagger_drop_down_lists_both_services() {
+        web.get().uri("/v3/api-docs/swagger-config").exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.urls[?(@.name == 'supplier-service')].url").isEqualTo("/supplier-service/v3/api-docs")
+            .jsonPath("$.urls[?(@.name == 'purchase-order-service')].url").isEqualTo("/purchase-order-service/v3/api-docs")
+            .jsonPath("$['urls.primaryName']").isEqualTo("supplier-service");   // the key really has a dot in it
+    }
+
+    @Test
+    void a_docs_request_reaches_the_service_as_its_own_v3_api_docs() {
+        web.get().uri("/supplier-service/v3/api-docs").exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("X-Served-By", "stub-as-supplier-service")
+            .expectBody().jsonPath("$.path").isEqualTo("/v3/api-docs");             // RewritePath did its job
+    }
+
     /** One stub that answers as whichever service the path belongs to. */
     private static HttpServer startStub() {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
-            server.createContext("/api/", exchange -> {
+            server.createContext("/", exchange -> {
                 String path = exchange.getRequestURI().getPath();
                 boolean orders = path.startsWith("/api/purchase-orders");
                 String received = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -1548,6 +1729,24 @@ class SupplierApiTest {
         mvc.perform(get("/api/suppliers"))
             .andExpect(header().string("X-Served-By", "supplier-service:8201"));
     }
+
+    @Test
+    void publishes_its_api_description_for_swagger() throws Exception {
+        mvc.perform(get("/v3/api-docs"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.info.title").value("Supplier Service"))
+            .andExpect(jsonPath("$.paths['/api/suppliers']").exists());
+    }
+
+    /** Behind the gateway, the description names the GATEWAY, so Swagger's "Try it out" goes through it. */
+    @Test
+    void the_description_names_the_gateway_when_called_through_it() throws Exception {
+        mvc.perform(get("/v3/api-docs")
+                .header("X-Forwarded-Proto", "http")
+                .header("X-Forwarded-Host", "localhost:8300")
+                .header("X-Forwarded-Port", "8300"))
+            .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8300"));
+    }
 }
 ```
 
@@ -1598,9 +1797,10 @@ class DiscoveryServerTest {
 | App | Tests | Covers |
 | --- | --- | --- |
 | discovery-server | 2 | The registry answers; the dashboard is served |
-| supplier-service | 4 | List, one, 404 problem, the `X-Served-By` header |
-| purchase-order-service | 7 | Order after asking supplier-service by name; suspended and unknown suppliers; 503 when it fails or isn't registered; validation |
-| api-gateway | 4 | Both routes, headers both ways, 404 for no route, the routes endpoint |
+| supplier-service | 6 | List, one, 404 problem, the `X-Served-By` header; its API description, which names the gateway when called through it |
+| purchase-order-service | 9 | Order after asking supplier-service by name; suspended and unknown suppliers; 503 when it fails or isn't registered; validation; its API description, as above |
+| api-gateway | 7 | Both routes, headers both ways, 404 for no route, the routes endpoint; Swagger UI, its drop-down, and the docs route's rewrite |
+| **Total** | **24** | |
 
 ---
 
@@ -1653,6 +1853,31 @@ Exposing the endpoint isn't enough: it's off by default. Set
 
 Harmless. Netty, under the gateway, looks for a native macOS DNS library, falls
 back to the system resolver, and carries on.
+</details>
+
+<details>
+<summary><b>Swagger's "Try it out" calls <code>localhost:8201</code>, not the gateway</b></summary>
+
+The description names the service's own address. The service needs
+`server.forward-headers-strategy: framework`, and the gateway needs
+`trusted-proxies`, or it sends no `X-Forwarded-*` headers. (Checked: remove the
+setting from a service and its forwarded-headers test fails with
+`expected http://localhost:8300 but was http://localhost`.)
+</details>
+
+<details>
+<summary><b>Swagger's server is <code>http://localhost:8300/supplier-service</code>, and "Try it out" is a 404</b></summary>
+
+`RewritePath` produced an `X-Forwarded-Prefix` header. Set
+`spring.cloud.gateway.server.webflux.x-forwarded.prefix-enabled: false`.
+</details>
+
+<details>
+<summary><b>The Swagger drop-down is empty, or says "Failed to load API definition"</b></summary>
+
+Open the URL it tries, e.g. http://localhost:8300/supplier-service/v3/api-docs.
+A 404 means the docs route is missing or its path doesn't match
+`springdoc.swagger-ui.urls`; a 503 means the service isn't registered yet.
 </details>
 
 <details>
@@ -1794,6 +2019,9 @@ a) POST can't be retried  b) Repeating a POST could create the same order twice 
 **6. supplier-service is completely down. What should creating a purchase order return?**\
 a) 500  b) 503: the order can't be checked right now  c) 201, and check later
 
+**7. Swagger UI at the gateway shows supplier-service. Where do "Try it out" requests go?**\
+a) Straight to port 8201  b) To the `servers` address in the description, which the forwarded headers make the gateway's  c) To Eureka
+
 <details>
 <summary>Answers</summary>
 
@@ -1803,6 +2031,7 @@ a) 500  b) 503: the order can't be checked right now  c) 201, and check later
 4. **b.** Lease expiry, eviction, and the caches add up (about 37 s with this project's settings).
 5. **b.** Only repeat what's safe to repeat.
 6. **b.** Never create an order nobody checked; say honestly that a dependency is down.
+7. **b.** Without the forwarded headers it would be **a**, and the gateway would be bypassed.
 </details>
 
 ---
@@ -1863,6 +2092,13 @@ check 422 "a SUSPENDED supplier is refused (rule needs the other service)" -X PO
       -d '{"supplierId":"S-003","item":"Cement","quantity":10,"unitPrice":18000}' "$GATEWAY/api/purchase-orders"
 check 422 "an unknown supplier is refused"                       -X POST -H "$JSON" \
       -d '{"supplierId":"S-999","item":"Cement","quantity":10,"unitPrice":18000}' "$GATEWAY/api/purchase-orders"
+
+echo "--- Swagger UI at the gateway: one UI, both services, Try it out through the gateway"
+check 200 "the Swagger UI page"                                   "$GATEWAY/swagger-ui/index.html"
+for svc in supplier-service purchase-order-service; do
+  srv=$(curl -s "$GATEWAY/$svc/v3/api-docs" | grep -o '"servers":\[{"url":"[^"]*"' | cut -d'"' -f6)
+  [ "$srv" = "$GATEWAY" ] && pass "     $svc's description names the gateway ($srv)" || fail "     $svc's description names '$srv', not $GATEWAY"
+done
 ```
 
 Expected output:
@@ -1873,7 +2109,7 @@ PASS       supplier-service: supplier-service:8201 supplier-service:8211
 PASS       purchase-order-service: purchase-order-service:8202 
 PASS       api-gateway: api-gateway:8300 
 --- the gateway routes by path
-PASS       routes: lb://supplier-service lb://purchase-order-service 
+PASS       routes: lb://supplier-service lb://purchase-order-service lb://supplier-service lb://purchase-order-service 
 PASS  200  GET /api/suppliers through the gateway
 PASS       the gateway marks its responses (X-Gateway: pis-api-gateway)
 PASS  404  a path no route matches
@@ -1881,7 +2117,11 @@ PASS  404  a path no route matches
 PASS       6 calls answered by: supplier-service:8201 supplier-service:8211 
 --- service to service: purchase-order-service finds supplier-service BY NAME
 PASS  201  order created after asking supplier-service
-PASS       two orders were checked by two copies: supplier-service:8211, supplier-service:8201
+PASS       two orders were checked by two copies: supplier-service:8201, supplier-service:8211
 PASS  422  a SUSPENDED supplier is refused (rule needs the other service)
 PASS  422  an unknown supplier is refused
+--- Swagger UI at the gateway: one UI, both services, Try it out through the gateway
+PASS  200  the Swagger UI page
+PASS       supplier-service's description names the gateway (http://localhost:8300)
+PASS       purchase-order-service's description names the gateway (http://localhost:8300)
 ```

@@ -74,11 +74,39 @@ class GatewayRoutingTest {
             .jsonPath("$[?(@.route_id == 'purchase-orders')].uri").isEqualTo("lb://purchase-order-service");
     }
 
+    // ------------------------------------------------------------ Swagger UI at the gateway
+
+    @Test
+    void swagger_ui_is_served_by_the_gateway() {
+        web.get().uri("/swagger-ui.html").exchange()
+            .expectStatus().is3xxRedirection()
+            .expectHeader().valueEquals("Location", "/swagger-ui/index.html");
+        web.get().uri("/swagger-ui/index.html").exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void the_swagger_drop_down_lists_both_services() {
+        web.get().uri("/v3/api-docs/swagger-config").exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.urls[?(@.name == 'supplier-service')].url").isEqualTo("/supplier-service/v3/api-docs")
+            .jsonPath("$.urls[?(@.name == 'purchase-order-service')].url").isEqualTo("/purchase-order-service/v3/api-docs")
+            .jsonPath("$['urls.primaryName']").isEqualTo("supplier-service");   // the key really has a dot in it
+    }
+
+    @Test
+    void a_docs_request_reaches_the_service_as_its_own_v3_api_docs() {
+        web.get().uri("/supplier-service/v3/api-docs").exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("X-Served-By", "stub-as-supplier-service")
+            .expectBody().jsonPath("$.path").isEqualTo("/v3/api-docs");             // RewritePath did its job
+    }
+
     /** One stub that answers as whichever service the path belongs to. */
     private static HttpServer startStub() {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
-            server.createContext("/api/", exchange -> {
+            server.createContext("/", exchange -> {
                 String path = exchange.getRequestURI().getPath();
                 boolean orders = path.startsWith("/api/purchase-orders");
                 String received = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);

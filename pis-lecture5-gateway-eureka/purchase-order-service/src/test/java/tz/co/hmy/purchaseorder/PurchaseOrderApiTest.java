@@ -108,6 +108,24 @@ class PurchaseOrderApiTest {
         mvc.perform(get("/api/purchase-orders/PO-9999")).andExpect(status().isNotFound());
     }
 
+    @Test
+    void publishes_its_api_description_for_swagger() throws Exception {
+        mvc.perform(get("/v3/api-docs"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.info.title").value("Purchase Order Service"))
+            .andExpect(jsonPath("$.paths['/api/purchase-orders']").exists());
+    }
+
+    /** Behind the gateway, the description names the GATEWAY, so Swagger's "Try it out" goes through it. */
+    @Test
+    void the_description_names_the_gateway_when_called_through_it() throws Exception {
+        mvc.perform(get("/v3/api-docs")
+                .header("X-Forwarded-Proto", "http")
+                .header("X-Forwarded-Host", "localhost:8300")
+                .header("X-Forwarded-Port", "8300"))
+            .andExpect(jsonPath("$.servers[0].url").value("http://localhost:8300"));
+    }
+
     // ------------------------------------------------------------ the stub supplier-service
 
     private static HttpServer startStub() {

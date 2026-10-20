@@ -11,6 +11,15 @@ spring:
     gateway:
       server:
         webflux:
+          # Send X-Forwarded-* headers to the services, so their API descriptions (Swagger)
+          # name the GATEWAY's address. Gateway 4.x only sends them for requests from a
+          # trusted proxy: here, this machine. In production: your load balancer's addresses.
+          trusted-proxies: 127\.0\.0\.1|0:0:0:0:0:0:0:1
+          x-forwarded:
+            # The docs routes rewrite /supplier-service/v3/api-docs to /v3/api-docs. Without
+            # this, that removed "/supplier-service" is reported as a prefix, and Swagger's
+            # "Try it out" would call /supplier-service/api/suppliers, which no route matches.
+            prefix-enabled: false
           routes:
             # lb:// means "a service name: ask Eureka, then load-balance across its copies".
             - id: suppliers
@@ -21,6 +30,19 @@ spring:
               uri: lb://purchase-order-service
               predicates:
                 - Path=/api/purchase-orders/**
+            # Each service's API description, fetched through the gateway for Swagger UI.
+            - id: supplier-service-docs
+              uri: lb://supplier-service
+              predicates:
+                - Path=/supplier-service/v3/api-docs
+              filters:
+                - RewritePath=/supplier-service/v3/api-docs, /v3/api-docs
+            - id: purchase-order-service-docs
+              uri: lb://purchase-order-service
+              predicates:
+                - Path=/purchase-order-service/v3/api-docs
+              filters:
+                - RewritePath=/purchase-order-service/v3/api-docs, /v3/api-docs
           default-filters:
             # Added to every response, so you can see a request came through the gateway.
             - AddResponseHeader=X-Gateway, pis-api-gateway
@@ -32,6 +54,16 @@ spring:
                 methods: GET
                 series: SERVER_ERROR
                 exceptions: java.io.IOException, java.util.concurrent.TimeoutException
+
+# One Swagger UI at http://localhost:8300/swagger-ui.html, with a drop-down per service.
+springdoc:
+  swagger-ui:
+    urls-primary-name: supplier-service      # the definition shown first
+    urls:
+      - name: supplier-service
+        url: /supplier-service/v3/api-docs
+      - name: purchase-order-service
+        url: /purchase-order-service/v3/api-docs
 
 eureka:
   client:

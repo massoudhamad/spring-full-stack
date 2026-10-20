@@ -1,4 +1,7 @@
 server:
+  # Trust the X-Forwarded-* headers the gateway adds, so the API description
+  # names the gateway's address, and Swagger's "Try it out" goes through it.
+  forward-headers-strategy: framework
   port: ${PORT:8201}             # run a second copy with  PORT=8211 mvn spring-boot:run
 
 spring:

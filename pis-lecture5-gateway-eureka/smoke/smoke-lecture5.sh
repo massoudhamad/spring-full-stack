@@ -43,3 +43,10 @@ check 422 "a SUSPENDED supplier is refused (rule needs the other service)" -X PO
       -d '{"supplierId":"S-003","item":"Cement","quantity":10,"unitPrice":18000}' "$GATEWAY/api/purchase-orders"
 check 422 "an unknown supplier is refused"                       -X POST -H "$JSON" \
       -d '{"supplierId":"S-999","item":"Cement","quantity":10,"unitPrice":18000}' "$GATEWAY/api/purchase-orders"
+
+echo "--- Swagger UI at the gateway: one UI, both services, Try it out through the gateway"
+check 200 "the Swagger UI page"                                   "$GATEWAY/swagger-ui/index.html"
+for svc in supplier-service purchase-order-service; do
+  srv=$(curl -s "$GATEWAY/$svc/v3/api-docs" | grep -o '"servers":\[{"url":"[^"]*"' | cut -d'"' -f6)
+  [ "$srv" = "$GATEWAY" ] && pass "     $svc's description names the gateway ($srv)" || fail "     $svc's description names '$srv', not $GATEWAY"
+done

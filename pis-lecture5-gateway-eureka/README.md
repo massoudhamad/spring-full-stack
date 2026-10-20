@@ -11,7 +11,7 @@ pis-lecture5-gateway-eureka/
 ├── discovery-server/        Eureka server                       :8761  dashboard: http://localhost:8761
 ├── supplier-service/        owns suppliers (run TWO copies)     :8201 and :8211
 ├── purchase-order-service/  owns orders; calls supplier-service :8202
-├── api-gateway/             the single front door               :8300
+├── api-gateway/             the single front door               :8300  Swagger UI: http://localhost:8300/swagger-ui.html
 └── smoke/smoke-lecture5.sh  checks everything end to end
 ```
 
@@ -32,10 +32,12 @@ Wait about 15 seconds after the last one starts, so every app has registered
 and every client has fetched the registry. Then, in a sixth terminal:
 
 ```bash
-bash smoke/smoke-lecture5.sh       # 12 checks, all should say PASS
+bash smoke/smoke-lecture5.sh       # 15 checks, all should say PASS
 ```
 
-Open http://localhost:8761 to see the Eureka dashboard.
+Open http://localhost:8761 to see the Eureka dashboard, and
+http://localhost:8300/swagger-ui.html for one Swagger UI covering both services
+(pick a service in the drop-down; **Try it out** goes through the gateway).
 
 ## Tests
 
@@ -45,7 +47,7 @@ for app in discovery-server supplier-service purchase-order-service api-gateway;
 done
 ```
 
-17 tests. None need anything running: a stub stands in for the other services.
+24 tests. None need anything running: a stub stands in for the other services.
 
 ## Ports
 
