@@ -1,15 +1,17 @@
 # pis-security-demo — the reference solution
 
-The PIS project with **Lessons 1–3D finished**: HTTP Basic, users in the
-database, JWT, refresh tokens, permissions with method security, and roles
-managed in the database. Use it to
+The PIS project with **Lessons 1–3F finished**: HTTP Basic, users in the
+database, JWT, refresh tokens, permissions with method security, roles
+managed in the database, and two filters of its own in the security filter
+chain (an access log, and a lock against password guessing), and URL rules
+read from the database. Use it to
 compare with your own code, or to demo a lesson without building it live.
 
 ```bash
 createdb pmis_demo && createdb pmis_demo_test
 cp .env.example .env        # set DB_URL=…/pmis_demo, TEST_DB_URL=…/pmis_demo_test,
                             # SERVER_PORT=8099, ADMIN_PASSWORD, JWT_SECRET (32+ characters)
-mvn test                    # 66 tests
+mvn test                    # 90 tests
 mvn spring-boot:run         # port 8099
 ```
 
@@ -22,7 +24,13 @@ bash smoke/smoke-lesson3.sh
 bash smoke/smoke-lesson3b.sh
 bash smoke/smoke-lesson3c.sh
 bash smoke/smoke-lesson3d.sh     # also uses the account auditor / auditor123, which it creates
+bash smoke/smoke-lesson3f.sh     # adds a URL rule and deletes it again
+bash smoke/smoke-lesson3e.sh     # on its own: it locks this machine out for a minute, then checks it lifts
 ```
+
+Lesson 3E blocks an address after 5 failed logins in a minute, and the scripts
+for Lessons 1–3 fail logins on purpose (5 between them). To run the scripts back
+to back, start the app with a higher limit: `LOGIN_MAX_FAILURES=50 mvn spring-boot:run`.
 
 The scripts use `http://localhost:8099` and the passwords `admin123`,
 `officer123` and `approver123`. Edit the top of a script if yours differ.

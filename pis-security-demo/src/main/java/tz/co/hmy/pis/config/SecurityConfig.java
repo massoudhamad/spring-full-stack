@@ -1,6 +1,7 @@
 package tz.co.hmy.pis.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,7 +13,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import tz.co.hmy.pis.security.DatabaseUrlRules;
+import tz.co.hmy.pis.security.LoginRateLimitFilter;
+import tz.co.hmy.pis.security.RequestLogFilter;
+
+import java.time.Clock;
 
 /**
  * Two ways to prove who you are, both checked by the same rules:
@@ -28,13 +36,20 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * Users live in the app_user table. DatabaseUserDetailsService is the only
  * UserDetailsService bean, so Spring Security picks it up without being told.
+ *
+ * Every line of filterChain() adds, configures or removes a FILTER. A request goes
+ * through them in order; run with --logging.level.org.springframework.security=TRACE
+ * to watch it. Two of the filters are ours: see addFilterBefore / addFilterAfter.
  */
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(LoginLimitProperties.class)
 public class SecurityConfig {
 
     private final ProblemDetailSecurityHandler problemHandler;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final LoginLimitProperties loginLimit;
+    private final DatabaseUrlRules urlRules;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -60,24 +75,15 @@ public class SecurityConfig {
 
                         // From here on, every rule names a PERMISSION, never a role.
                         // Which roles hold which permission is data, in the role_permission table.
+
+                        // The admin endpoints stay in CODE: no row in url_rule can lock the
+                        // admins out of fixing the rules.
                         .requestMatchers("/api/v1/users/**").hasAuthority("user:manage")
-                        .requestMatchers("/api/v1/roles/**", "/api/v1/permissions").hasAuthority("role:manage")
+                        .requestMatchers("/api/v1/roles/**", "/api/v1/permissions",
+                                "/api/v1/url-rules/**").hasAuthority("role:manage")
 
-                        // Specific actions first: the first match wins.
-                        .requestMatchers(HttpMethod.POST, "/api/v1/requisitions/*/approve",
-                                "/api/v1/requisitions/*/reject").hasAuthority("requisition:approve")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/suppliers/*/status").hasAuthority("supplier:approve")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").hasAuthority("record:delete")
-
-                        // Then read and write, one pair per resource.
-                        .requestMatchers(HttpMethod.GET, "/api/v1/suppliers/**").hasAuthority("supplier:read")
-                        .requestMatchers("/api/v1/suppliers/**").hasAuthority("supplier:write")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/requisitions/**").hasAuthority("requisition:read")
-                        .requestMatchers("/api/v1/requisitions/**").hasAuthority("requisition:write")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/purchase-orders/**").hasAuthority("purchase-order:read")
-                        .requestMatchers("/api/v1/purchase-orders/**").hasAuthority("purchase-order:write")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/invoices/**").hasAuthority("invoice:read")
-                        .requestMatchers("/api/v1/invoices/**").hasAuthority("invoice:write")
+                        // Everything else under /api/v1: the url_rule table decides (Lesson 3F).
+                        .requestMatchers("/api/v1/**").access(urlRules)
 
                         // Anything not listed above is refused rather than left open.
                         .anyRequest().denyAll())
@@ -93,6 +99,13 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(problemHandler)   // 401: who are you?
                         .accessDeniedHandler(problemHandler))       // 403: I know you, but no
+
+                // Our own filters. Each is placed next to a filter Spring Security already has.
+                // BEFORE the login filters: can refuse a password guess before it's checked.
+                .addFilterBefore(new LoginRateLimitFilter(loginLimit, Clock.systemUTC(), problemHandler),
+                        BearerTokenAuthenticationFilter.class)
+                // AFTER the login filters: knows who the caller is.
+                .addFilterAfter(new RequestLogFilter(), BasicAuthenticationFilter.class)
                 .build();
     }
 

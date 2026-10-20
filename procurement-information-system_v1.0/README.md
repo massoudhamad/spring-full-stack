@@ -16,6 +16,8 @@ upgrades this project, and each one ends with tests you can run.
 | 3B | [Refresh tokens](docs/lessons/03b-refresh-tokens.md) | 5-minute tokens, rotation, logout |
 | 3C | [Permissions and method security](docs/lessons/03c-permissions.md) | `hasAuthority`, `@PreAuthorize`, nobody approves their own requisition |
 | 3D | [Roles and permissions in the database](docs/lessons/03d-roles-in-database.md) | Roles as data, an admin API for them, guard rails |
+| 3E | [The security filter chain](docs/lessons/03e-filter-chain.md) | Watch the chain; your own filters: an access log, a lock against password guessing |
+| 3F | [URL rules in the database](docs/lessons/03f-url-rules-in-database.md) | Which permission each endpoint needs, as data; your own `AuthorizationManager` |
 
 - **[Testing guide](docs/lessons/TESTING.md):** test each lesson step by step: the command, what you should see, and what to check if it doesn't match.
 - **[Course index](docs/lessons/):** the full course map, including the OAuth2 lectures.

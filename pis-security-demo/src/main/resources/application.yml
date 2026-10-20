@@ -35,6 +35,13 @@ pis:
       # a disabled account or a stolen access token keeps working.
       expiry: 5m
       refresh-expiry: 8h
+    # Password guessing: after 5 failed logins from one address, that address
+    # must wait until a minute has passed since its first failure (429).
+    # The smoke tests of Lessons 1-3 fail logins on purpose: raise the limit while
+    # running them back to back, e.g.  LOGIN_MAX_FAILURES=50 mvn spring-boot:run
+    login-limit:
+      max-failures: ${LOGIN_MAX_FAILURES:5}
+      window: 1m
 
 springdoc:
   swagger-ui:

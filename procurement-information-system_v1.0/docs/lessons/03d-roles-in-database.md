@@ -1666,6 +1666,9 @@ PASS  422  an unknown role is a 422
 
 ## Next
 
-**→ [Lecture 4 — OAuth2 with Spring Authorization Server](../../../pis-lecture4-authorization-server/LECTURE.md).**
-Lecture 4 starts from Lesson 3B. Exercise idea: move its hard-coded users and
-their roles into tables the same way, on the authorization server's side.
+**→ [Lesson 3E — The Security Filter Chain](03e-filter-chain.md).** Open up
+`SecurityConfig`: watch a request go through every filter, then add your own.
+
+After that, [Lecture 4 — OAuth2 with Spring Authorization Server](../../../pis-lecture4-authorization-server/LECTURE.md)
+starts from Lesson 3B. Exercise idea: move its hard-coded users and their roles
+into tables the same way, on the authorization server's side.

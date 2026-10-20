@@ -18,8 +18,10 @@ on your machine; the status codes and the fields should not.
 | [3B · Refresh tokens](#lesson-3b--refresh-tokens) | `RefreshTokenTest` (9 tests) | yes | 6 |
 | [3C · Permissions and method security](#lesson-3c--permissions-and-method-security) | `PermissionTest` (8 tests) | yes | 9 |
 | [3D · Roles and permissions in the database](#lesson-3d--roles-and-permissions-in-the-database) | `RoleApiTest` (10 tests) | yes | 9 |
+| [3E · The security filter chain](#lesson-3e--the-security-filter-chain) | `FilterChainTest`, `LoginLimitTest`, `LoginRateLimitFilterTest` (13 tests) | yes | 7 |
+| [3F · URL rules in the database](#lesson-3f--url-rules-in-the-database) | `UrlRuleTest` (11 tests) | yes | 9 |
 | [4 · OAuth2 with Spring Authorization Server](#lecture-4--oauth2-with-spring-authorization-server) | both apps (8 + 15 tests) | both apps | 9 |
-| [5 · API gateway and service discovery](#lecture-5--api-gateway-and-service-discovery) | four apps (17 tests) | all five apps | 9 |
+| [5 · API gateway and service discovery](#lecture-5--api-gateway-and-service-discovery) | four apps (24 tests) | all five apps | 10 |
 
 ## Before you start: set your variables
 
@@ -999,6 +1001,406 @@ curl -s -u admin:$ADMIN_PW -X PUT -H "$JSON" $BASE/api/v1/roles/AUDITOR/permissi
 
 ---
 
+## Lesson 3E — The security filter chain
+
+**You need:** The Lesson 3E code, and the officer and approver from Lesson 2. Steps 4–7 count failed logins and lock your machine out for a minute: do them last, and at least a minute after any other lesson's steps, because their wrong passwords count too.
+
+### Step 1 · Run this lesson's unit tests
+
+They use the test database, not the running app.
+
+```bash
+mvn test -Dtest='FilterChainTest,LoginLimitTest,LoginRateLimitFilterTest' | grep -E 'Tests run:|BUILD'
+```
+
+**You should see** 13 tests, no failures, and `BUILD SUCCESS`:
+
+```
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.168 s -- in tz.co.hmy.pis.security.LoginRateLimitFilterTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.129 s -- in tz.co.hmy.pis.FilterChainTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.078 s -- in tz.co.hmy.pis.LoginLimitTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+> **If not:** `No tests were executed`: this lesson's test classes don't exist yet. A failure in `the_chain_is_a_list_of_filters…`: a filter is in the wrong place (`addFilterBefore` / `addFilterAfter`).
+
+### Step 2 · Watch a request go through the chain
+
+Stop the app (Ctrl+C) and start it with the filter chain's trace switched on:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.arguments=--logging.level.org.springframework.security.web.FilterChainProxy=TRACE
+```
+
+Then send one request:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/suppliers
+```
+
+**You should see** `200` here, and in the **app's terminal** the 16 filters it went through, in order. Ours are 6 and 9:
+
+```
+200
+```
+
+In the app's terminal:
+
+```
+Invoking DisableEncodeUrlFilter (1/16)
+Invoking WebAsyncManagerIntegrationFilter (2/16)
+Invoking SecurityContextHolderFilter (3/16)
+Invoking HeaderWriterFilter (4/16)
+Invoking LogoutFilter (5/16)
+Invoking LoginRateLimitFilter (6/16)
+Invoking BearerTokenAuthenticationFilter (7/16)
+Invoking BasicAuthenticationFilter (8/16)
+Invoking RequestLogFilter (9/16)
+Invoking AuthenticationFilter (10/16)
+Invoking RequestCacheAwareFilter (11/16)
+Invoking SecurityContextHolderAwareRequestFilter (12/16)
+Invoking AnonymousAuthenticationFilter (13/16)
+Invoking SessionManagementFilter (14/16)
+Invoking ExceptionTranslationFilter (15/16)
+Invoking AuthorizationFilter (16/16)
+```
+
+When you've seen it, stop the app (Ctrl+C) and start it normally again (`mvn spring-boot:run`): the trace is very noisy.
+
+> **If not:** Fewer lines: the trace switch has a typo. `LoginRateLimitFilter` or `RequestLogFilter` missing: they aren't added in `SecurityConfig`.
+
+### Step 3 · The request log names the user
+
+Four requests: allowed, refused by a rule, no credentials, and a JWT.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/suppliers
+curl -s -o /dev/null -w '%{http_code}\n' -u officer:$OFFICER_PW -X PATCH -H "$JSON" -d '{"status":"ACTIVE"}' $BASE/api/v1/suppliers/$ID/status
+curl -s -o /dev/null -w '%{http_code}\n' $BASE/api/v1/requisitions
+TOKEN=$(curl -s -X POST -H "$JSON" -d "{\"username\":\"approver\",\"password\":\"$APPROVER_PW\"}" $BASE/api/v1/auth/login | jq -r .accessToken)
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" $BASE/api/v1/invoices
+```
+
+**You should see** `200`, `403`, `401`, `200`, and in the **app's terminal** one `RequestLogFilter` line for each request, with its status and who sent it. The login itself is logged too, as `anonymous`: nobody is logged in *while* logging in:
+
+```
+200
+403
+401
+200
+```
+
+In the app's terminal:
+
+```
+RequestLogFilter: GET /api/v1/suppliers -> 200 by officer in 22 ms
+RequestLogFilter: PATCH /api/v1/suppliers/99999999-9999-9999-9999-999999999999/status -> 403 by officer in 5 ms
+RequestLogFilter: GET /api/v1/requisitions -> 401 by anonymous in 0 ms
+RequestLogFilter: POST /api/v1/auth/login -> 200 by anonymous in 123 ms
+RequestLogFilter: GET /api/v1/invoices -> 200 by approver in 5 ms
+```
+
+> **If not:** No `RequestLogFilter` lines: it isn't added in `SecurityConfig`. The same line twice per request: it's a `@Component` **and** a plain `Filter` (Common mistakes).
+
+### Step 4 · A wrong password never reaches the request log
+
+`BasicAuthenticationFilter` (8) answers 401 itself and stops the chain. Our rate-limit filter (6) is outside it, so it sees the 401 on the way back.
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' -u officer:wrong $BASE/api/v1/suppliers
+```
+
+**You should see** `401`, and in the **app's terminal** only `Failed login 1 of 5`. No `RequestLogFilter` line. (`0:0:0:0:0:0:0:1` is `localhost` in IPv6):
+
+```
+401
+```
+
+In the app's terminal:
+
+```
+LoginRateLimitFilter: Failed login 1 of 5 from 0:0:0:0:0:0:0:1
+```
+
+> **If not:** A `RequestLogFilter` line for this request: the request log was added before `BasicAuthenticationFilter`.
+
+### Step 5 · Guessing passwords gets you blocked
+
+Four more wrong guesses make five failures. After that, every login attempt from this address is refused, even with the right password, and even at the login endpoint.
+
+```bash
+for i in 1 2 3 4; do curl -s -o /dev/null -w "guess $i: %{http_code}\n" -u officer:guess$i $BASE/api/v1/suppliers; done
+curl -s -D - -u officer:$OFFICER_PW $BASE/api/v1/suppliers | grep -iE '^(HTTP|retry-after)|title'
+curl -s -X POST -H "$JSON" -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PW\"}" $BASE/api/v1/auth/login | jq -c '{status, title}'
+```
+
+**You should see** Four `401`s, then `429` with a `Retry-After` header, for the right password and for the login endpoint. The app's terminal counts up to `Failed login 5 of 5`:
+
+```
+guess 1: 401
+guess 2: 401
+guess 3: 401
+guess 4: 401
+HTTP/1.1 429 
+Retry-After: 59
+{"type":"https://hmy.co.tz/problems/too-many-logins","title":"Too many failed logins","status":429,"detail":"Too many failed logins from your address. Try again in 59 seconds","timestamp":"2026-10-20T08:49:16.909643Z"}
+{"status":429,"title":"Too many failed logins"}
+```
+
+In the app's terminal:
+
+```
+LoginRateLimitFilter: Failed login 2 of 5 from 0:0:0:0:0:0:0:1
+LoginRateLimitFilter: Failed login 3 of 5 from 0:0:0:0:0:0:0:1
+LoginRateLimitFilter: Failed login 4 of 5 from 0:0:0:0:0:0:0:1
+LoginRateLimitFilter: Failed login 5 of 5 from 0:0:0:0:0:0:0:1
+```
+
+> **If not:** `401` instead of `429`: the limit is higher (check `LOGIN_MAX_FAILURES`), or more than a minute passed since the first wrong password.
+
+### Step 6 · Requests that aren't logins still work
+
+Only login attempts are blocked. A request with no credentials isn't a guess.
+
+```bash
+curl -s -o /dev/null -w 'no credentials: %{http_code}\n' $BASE/api/v1/suppliers
+curl -s -o /dev/null -w 'health:         %{http_code}\n' $BASE/actuator/health
+```
+
+**You should see** `401` (not `429`) and `200`:
+
+```
+no credentials: 401
+health:         200
+```
+
+### Step 7 · A minute later, the block lifts
+
+The window is one minute from the **first** failure: the single wrong password before the guessing.
+
+```bash
+sleep 60
+curl -s -o /dev/null -w 'right password: %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/suppliers
+```
+
+**You should see** `200`:
+
+```
+right password: 200
+```
+
+> **If not:** `429`: wait the number of seconds in `Retry-After`, then try again.
+
+✅ **Lesson 3E passes** when every step above matches.
+
+---
+
+## Lesson 3F — URL rules in the database
+
+**You need:** The Lesson 3F code (migration V8 runs on start), and the officer and approver from Lesson 2. Steps 5–8 change the rules: do them in order, and don't skip step 8, which puts rule 30 back.
+
+### Step 1 · Run this lesson's unit tests
+
+They use the test database, not the running app.
+
+```bash
+mvn test -Dtest=UrlRuleTest | grep -E 'Tests run:|BUILD'
+```
+
+**You should see** 11 tests, no failures, and `BUILD SUCCESS`:
+
+```
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.804 s -- in tz.co.hmy.pis.UrlRuleTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+> **If not:** `No tests were executed`: `UrlRuleTest` doesn't exist yet. Run the **whole** suite too (`mvn test`): every other test class checks the seeded rules.
+
+### Step 2 · The rules are rows
+
+Migration V8 moved the rules out of `SecurityConfig`, in the same order.
+
+```bash
+psql -d $DB -c "SELECT priority, coalesce(http_method, 'ANY') AS method, pattern, permission
+  FROM url_rule ORDER BY priority;"
+```
+
+**You should see** The 12 rules, from `10 POST /api/v1/requisitions/*/approve` to `120 ANY /api/v1/invoices/**`:
+
+```
+ priority | method |            pattern             |      permission      
+----------+--------+--------------------------------+----------------------
+       10 | POST   | /api/v1/requisitions/*/approve | REQUISITION_APPROVE
+       20 | POST   | /api/v1/requisitions/*/reject  | REQUISITION_APPROVE
+       30 | PATCH  | /api/v1/suppliers/*/status     | SUPPLIER_APPROVE
+       40 | DELETE | /api/v1/**                     | RECORD_DELETE
+       50 | GET    | /api/v1/suppliers/**           | SUPPLIER_READ
+       60 | ANY    | /api/v1/suppliers/**           | SUPPLIER_WRITE
+       70 | GET    | /api/v1/requisitions/**        | REQUISITION_READ
+       80 | ANY    | /api/v1/requisitions/**        | REQUISITION_WRITE
+       90 | GET    | /api/v1/purchase-orders/**     | PURCHASE_ORDER_READ
+      100 | ANY    | /api/v1/purchase-orders/**     | PURCHASE_ORDER_WRITE
+      110 | GET    | /api/v1/invoices/**            | INVOICE_READ
+      120 | ANY    | /api/v1/invoices/**            | INVOICE_WRITE
+(12 rows)
+```
+
+> **If not:** `relation "url_rule" does not exist`: the app hasn't started since you added V8.
+
+### Step 3 · The same, through the API
+
+Permissions are shown as authorities, like everywhere else in the API.
+
+```bash
+curl -s -u admin:$ADMIN_PW $BASE/api/v1/url-rules | jq -r '.[] | "\(.priority) \(.method) \(.pattern) -> \(.permission)"'
+```
+
+**You should see** The same 12 rules:
+
+```
+10 POST /api/v1/requisitions/*/approve -> requisition:approve
+20 POST /api/v1/requisitions/*/reject -> requisition:approve
+30 PATCH /api/v1/suppliers/*/status -> supplier:approve
+40 DELETE /api/v1/** -> record:delete
+50 GET /api/v1/suppliers/** -> supplier:read
+60 ANY /api/v1/suppliers/** -> supplier:write
+70 GET /api/v1/requisitions/** -> requisition:read
+80 ANY /api/v1/requisitions/** -> requisition:write
+90 GET /api/v1/purchase-orders/** -> purchase-order:read
+100 ANY /api/v1/purchase-orders/** -> purchase-order:write
+110 GET /api/v1/invoices/** -> invoice:read
+120 ANY /api/v1/invoices/** -> invoice:write
+```
+
+> **If not:** `403`: the admin lacks `role:manage`, or `/api/v1/url-rules/**` is missing from the `role:manage` line in `SecurityConfig`.
+
+### Step 4 · Which rule decides?
+
+Ask for a request without sending it. The first matching rule decides; a request that matches none is refused, even for the admin, who has every permission.
+
+```bash
+curl -s -u admin:$ADMIN_PW "$BASE/api/v1/url-rules/match?method=PATCH&path=/api/v1/suppliers/$ID/status" | jq -c '{decision}'
+curl -s -u admin:$ADMIN_PW "$BASE/api/v1/url-rules/match?method=GET&path=/api/v1/reports" | jq -c '{decision}'
+curl -s -o /dev/null -w 'admin, GET /api/v1/reports: %{http_code}\n' -u admin:$ADMIN_PW $BASE/api/v1/reports
+```
+
+**You should see** Rule 30 decides the status change; nothing matches `/api/v1/reports`, so even the admin gets `403`:
+
+```
+{"decision":"needs supplier:approve (rule 30)"}
+{"decision":"no rule matches: denied"}
+admin, GET /api/v1/reports: 403
+```
+
+### Step 5 · Change what an endpoint needs, while PIS is running
+
+A new rule at priority 65 sits before rule 70 (any reader may read requisitions), so it wins: only approvers may read them now.
+
+```bash
+curl -s -o /dev/null -w 'officer, before: %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/requisitions
+RULE=$(curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/url-rules \
+  -d '{"priority":65,"method":"GET","pattern":"/api/v1/requisitions/**","permission":"requisition:approve","description":"Only approvers may read requisitions"}')
+echo "$RULE" | jq -c '{id, priority, method, pattern, permission, updatedBy}'; RULE_ID=$(echo "$RULE" | jq .id)
+curl -s -o /dev/null -w 'officer, after:  %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/requisitions
+curl -s -o /dev/null -w 'approver, after: %{http_code}\n' -u approver:$APPROVER_PW $BASE/api/v1/requisitions
+```
+
+**You should see** `200` for the officer, the new rule (recorded as changed by `admin`), then `403` for the officer and `200` for the approver. No restart:
+
+```
+officer, before: 200
+{"id":13,"priority":65,"method":"GET","pattern":"/api/v1/requisitions/**","permission":"requisition:approve","updatedBy":"admin"}
+officer, after:  403
+approver, after: 200
+```
+
+> **If not:** `409`: a rule already uses priority 65 (an earlier run). Delete it, or use another priority between 60 and 70.
+
+### Step 6 · Take it away again
+
+The officer can read requisitions on the very next request.
+
+```bash
+curl -s -o /dev/null -w 'delete the rule: %{http_code}\n' -u admin:$ADMIN_PW -X DELETE $BASE/api/v1/url-rules/$RULE_ID
+curl -s -o /dev/null -w 'officer:         %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/requisitions
+```
+
+**You should see** `204`, then `200`:
+
+```
+delete the rule: 204
+officer:         200
+```
+
+### Step 7 · Order matters: deleting a rule can OPEN an endpoint
+
+Rule 30 says a status change needs `supplier:approve`. Delete it, and rule 60 (any method on suppliers: `supplier:write`) decides instead. Officers have `supplier:write`. `$ID` is a supplier that doesn't exist, so a `404` proves the request got **past** security without changing anything.
+
+```bash
+curl -s -o /dev/null -w 'officer changes a status, before: %{http_code}\n' -u officer:$OFFICER_PW -X PATCH -H "$JSON" -d '{"status":"ACTIVE"}' $BASE/api/v1/suppliers/$ID/status
+R30=$(curl -s -u admin:$ADMIN_PW $BASE/api/v1/url-rules | jq '.[] | select(.priority == 30) | .id')
+curl -s -o /dev/null -w 'delete rule 30: %{http_code}\n' -u admin:$ADMIN_PW -X DELETE $BASE/api/v1/url-rules/$R30
+curl -s -u admin:$ADMIN_PW "$BASE/api/v1/url-rules/match?method=PATCH&path=/api/v1/suppliers/$ID/status" | jq -c '{decision}'
+curl -s -o /dev/null -w 'officer changes a status, after:  %{http_code}\n' -u officer:$OFFICER_PW -X PATCH -H "$JSON" -d '{"status":"ACTIVE"}' $BASE/api/v1/suppliers/$ID/status
+```
+
+**You should see** `403`, then rule 60 decides and the officer gets `404`: past security:
+
+```
+officer changes a status, before: 403
+delete rule 30: 204
+{"decision":"needs supplier:write (rule 60)"}
+officer changes a status, after:  404
+```
+
+### Step 8 · Put rule 30 back
+
+Same priority, same pattern, same permission.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/url-rules \
+  -d '{"priority":30,"method":"PATCH","pattern":"/api/v1/suppliers/*/status","permission":"supplier:approve","description":"Activating or suspending a supplier"}' | jq -c '{priority, pattern, permission}'
+curl -s -o /dev/null -w 'officer changes a status: %{http_code}\n' -u officer:$OFFICER_PW -X PATCH -H "$JSON" -d '{"status":"ACTIVE"}' $BASE/api/v1/suppliers/$ID/status
+```
+
+**You should see** Rule 30 again, and `403` for the officer:
+
+```
+{"priority":30,"pattern":"/api/v1/suppliers/*/status","permission":"supplier:approve"}
+officer changes a status: 403
+```
+
+> **If not:** Don't skip this step: without rule 30, every officer can activate suppliers.
+
+### Step 9 · The guard rails
+
+Four changes PIS refuses.
+
+```bash
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/url-rules \
+  -d '{"priority":5,"pattern":"/api/v1/roles/**","permission":"supplier:read","description":"x"}' | jq -c '{status, detail}'
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/url-rules \
+  -d '{"priority":5,"pattern":"/api/v1/**/approve","permission":"supplier:read","description":"x"}' | jq -c '{status, detail}'
+curl -s -u admin:$ADMIN_PW -X POST -H "$JSON" $BASE/api/v1/url-rules \
+  -d '{"priority":50,"pattern":"/api/v1/reports/**","permission":"supplier:read","description":"x"}' | jq -c '{status, detail}'
+curl -s -o /dev/null -w 'officer reads the rules: %{http_code}\n' -u officer:$OFFICER_PW $BASE/api/v1/url-rules
+```
+
+**You should see** An admin endpoint (`422`), a pattern Spring can't read (`422`), a priority that's taken (`409`), and an officer (`403`):
+
+```
+{"status":422,"detail":"/api/v1/roles/** is an admin endpoint. Those are protected in code, so a rule can never lock the admins out"}
+{"status":422,"detail":"Pattern /api/v1/**/approve is not valid: No more pattern data allowed after {*...} or ** pattern element"}
+{"status":409,"detail":"Priority 50 is already used by rule 5 (/api/v1/suppliers/**)"}
+officer reads the rules: 403
+```
+
+✅ **Lesson 3F passes** when every step above matches.
+
+---
+
 ## Lecture 4 — OAuth2 with Spring Authorization Server
 
 **You need:** Both apps of `pis-lecture4-authorization-server/` running: `auth-server` first, then `pis-api`. Its logins are `officer` / `officer123` and friends, and the client
@@ -1193,7 +1595,7 @@ for app in discovery-server supplier-service purchase-order-service api-gateway;
 done
 ```
 
-**You should see** All four say `all tests pass` (2 + 4 + 7 + 4 = 17 tests):
+**You should see** All four say `all tests pass` (2 + 6 + 9 + 7 = 24 tests):
 
 ```
 discovery-server: all tests pass
@@ -1225,17 +1627,19 @@ PURCHASE-ORDER-SERVICE: purchase-order-service:8202
 
 ### Step 3 · The gateway's routes
 
-Two routes, each pointing at a service NAME (`lb://`), not an address.
+Each route points at a service NAME (`lb://`), not an address. Two carry the API; two fetch each service's API description for Swagger UI.
 
 ```bash
 curl -s $GATEWAY/actuator/gateway/routes | jq -c '.[] | {route_id, uri}'
 ```
 
-**You should see** The `suppliers` and `purchase-orders` routes with their `lb://` URIs:
+**You should see** Four routes: `suppliers`, `purchase-orders`, and the two `-docs` routes, all with `lb://` URIs:
 
 ```
 {"route_id":"suppliers","uri":"lb://supplier-service"}
 {"route_id":"purchase-orders","uri":"lb://purchase-order-service"}
+{"route_id":"supplier-service-docs","uri":"lb://supplier-service"}
+{"route_id":"purchase-order-service-docs","uri":"lb://purchase-order-service"}
 ```
 
 > **If not:** `404`: the `gateway` endpoint isn't switched on (`management.endpoint.gateway.access`).
@@ -1252,7 +1656,7 @@ curl -s -D - -o /dev/null $GATEWAY/api/suppliers/S-001 | grep -iE '^(HTTP|x-serv
 
 ```
 HTTP/1.1 200 OK
-X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
 X-Gateway: pis-api-gateway
 ```
 
@@ -1271,12 +1675,12 @@ done
 **You should see** The two copies taking turns:
 
 ```
-X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
 X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
 X-Served-By: supplier-service:8201
 X-Served-By: supplier-service:8211
+X-Served-By: supplier-service:8201
 ```
 
 > **If not:** Always the same copy: the second copy isn't registered, or the load balancer's 5-second cache hasn't refreshed yet.
@@ -1293,7 +1697,7 @@ curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
 **You should see** `201` with the supplier's name and `checkedBy` naming a copy of supplier-service:
 
 ```
-{"id":"PO-0009","supplierName":"Kisiwa ICT Consultants","total":5000000.00,"checkedBy":"supplier-service:8201"}
+{"id":"PO-0007","supplierName":"Kisiwa ICT Consultants","total":5000000.00,"checkedBy":"supplier-service:8201"}
 ```
 
 > **If not:** `503 Supplier service unavailable`: no copy of supplier-service is registered.
@@ -1312,8 +1716,8 @@ done
 **You should see** Two orders, two different `checkedBy` copies:
 
 ```
-{"id":"PO-0010","checkedBy":"supplier-service:8211"}
-{"id":"PO-0011","checkedBy":"supplier-service:8201"}
+{"id":"PO-0008","checkedBy":"supplier-service:8211"}
+{"id":"PO-0009","checkedBy":"supplier-service:8201"}
 ```
 
 ### Step 8 · A rule that needs the other service
@@ -1334,7 +1738,31 @@ curl -s -X POST -H "$JSON" $GATEWAY/api/purchase-orders \
 {"status":422,"detail":"Unknown supplier S-999"}
 ```
 
-### Step 9 · Stop one copy: nothing breaks
+### Step 9 · Swagger UI through the gateway
+
+One Swagger UI for both services. Its drop-down lists each service's description, fetched through the gateway, and each description names the gateway as its server, so "Try it out" goes through the gateway too.
+
+```bash
+curl -s $GATEWAY/v3/api-docs/swagger-config | jq -c '.urls[]'
+for svc in supplier-service purchase-order-service; do
+  curl -s $GATEWAY/$svc/v3/api-docs | jq -c '{title: .info.title, servers: [.servers[].url], paths: (.paths | keys)}'
+done
+```
+
+**You should see** Both services in the drop-down, and both descriptions with the server `http://localhost:8300`:
+
+```
+{"url":"/purchase-order-service/v3/api-docs","name":"purchase-order-service"}
+{"url":"/supplier-service/v3/api-docs","name":"supplier-service"}
+{"title":"Supplier Service","servers":["http://localhost:8300"],"paths":["/api/suppliers","/api/suppliers/{id}"]}
+{"title":"Purchase Order Service","servers":["http://localhost:8300"],"paths":["/api/purchase-orders","/api/purchase-orders/{id}"]}
+```
+
+Then open http://localhost:8300/swagger-ui.html in a browser. Pick **supplier-service** in the "Select a definition" drop-down, open `GET /api/suppliers`, press **Try it out**, then **Execute**. The response headers include `x-gateway: pis-api-gateway`: the request went through the gateway.
+
+> **If not:** Server `http://localhost:8201`: `forward-headers-strategy` is missing in the service, or `trusted-proxies` in the gateway. Server ending in `/supplier-service`: `x-forwarded.prefix-enabled: false` is missing. A 404 or 503 for a description: see Common mistakes in the lecture.
+
+### Step 10 · Stop one copy: nothing breaks
 
 Press **Ctrl+C** in the terminal running supplier-service on **8211**, then run this straight away. It unregisters from Eureka as it stops, and the gateway's Retry filter covers the few seconds before everyone has noticed.
 
@@ -1345,7 +1773,7 @@ done; echo
 curl -s -H 'Accept: application/json' $EUREKA/eureka/apps/SUPPLIER-SERVICE | jq -r '[.application.instance[].instanceId] | join(", ")'
 ```
 
-**You should see** Ten `200`s, and only `supplier-service:8201` left in Eureka. Start 8211 again afterwards.:
+**You should see** Ten `200`s, and only `supplier-service:8201` left in Eureka. Start 8211 again afterwards:
 
 ```
 200 200 200 200 200 200 200 200 200 200 

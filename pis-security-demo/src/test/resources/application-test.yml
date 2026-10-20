@@ -26,3 +26,8 @@ pis:
       secret: test-only-secret-that-is-at-least-32-bytes-long
       expiry: 30m
       refresh-expiry: 8h
+    # High, so the many wrong-password tests can't lock each other out.
+    # LoginLimitTest sets its own, low limit.
+    login-limit:
+      max-failures: 1000
+      window: 1m

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -23,6 +24,7 @@ import java.time.Instant;
  *
  * GlobalExceptionHandler cannot do this: security runs in a servlet filter,
  * before the request reaches any controller, so @RestControllerAdvice never sees it.
+ * The same goes for the 429 from LoginRateLimitFilter.
  */
 @Component
 @RequiredArgsConstructor
@@ -56,6 +58,15 @@ public class ProblemDetailSecurityHandler implements AuthenticationEntryPoint, A
                        AccessDeniedException ex) throws IOException {
         write(response, HttpStatus.FORBIDDEN, "Access denied",
                 "Your role does not permit this operation", "forbidden");
+    }
+
+    /** Too many failed logins from one address (LoginRateLimitFilter). */
+    public void tooManyLogins(HttpServletResponse response, Duration wait) throws IOException {
+        long seconds = Math.max(1, (wait.toMillis() + 999) / 1000);       // round up, never 0
+        response.setHeader(HttpHeaders.RETRY_AFTER, String.valueOf(seconds));
+        write(response, HttpStatus.TOO_MANY_REQUESTS, "Too many failed logins",
+                "Too many failed logins from your address. Try again in " + seconds + " seconds",
+                "too-many-logins");
     }
 
     private void write(HttpServletResponse response, HttpStatus status, String title,
